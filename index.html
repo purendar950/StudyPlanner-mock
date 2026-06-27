@@ -167,7 +167,11 @@
     document.getElementById('hero').style.display = loggedIn ? 'none' : 'block';
     document.getElementById('app').style.display  = loggedIn ? 'block' : 'none';
     document.getElementById('bnav').style.display  = loggedIn ? 'flex' : 'none';
-    if(loggedIn){ loadAttempts().then(function(){ navTo('exams'); }); }
+    if(loggedIn){ loadAttempts().then(function(){
+      var saved=null; try{ saved=JSON.parse(sessionStorage.getItem('sp_nav')||'null'); }catch(e){}
+      if(saved && saved.length){ NAV=saved; syncBottom(); render(); }
+      else navTo('exams');
+    }); }
   }
 
   /* ── Auth modal ── */
@@ -190,7 +194,7 @@
       if(r.data.session){ CURRENT_USER=r.data.user; syncIdentity(); renderAcct(); closeAuth(); await loadAttempts(); navTo('exams'); if(pendingTestId){ var id=pendingTestId; pendingTestId=null; startTest(id);} }
       else { m.className='msg ok'; m.textContent='Account created! Check your email to confirm, then sign in.'; authTab('login'); } }
     catch(e){ m.className='msg err'; m.textContent=e.message||'Sign up failed.'; } }
-  async function doLogout(){ try{ await SB.auth.signOut(); }catch(e){} CURRENT_USER=null; syncIdentity(); renderAcct(); renderShell(); }
+  async function doLogout(){ try{ await SB.auth.signOut(); }catch(e){} try{ sessionStorage.removeItem('sp_nav'); }catch(e){} CURRENT_USER=null; syncIdentity(); renderAcct(); renderShell(); }
 
   /* ── Attempts (for Start vs Analysis/Reattempt + Profile) ── */
   async function loadAttempts(){ ATTEMPTED={};
@@ -209,11 +213,16 @@
   function push(state){ NAV.push(state); render(); }
   function goBack(){ if(NAV.length>1){ NAV.pop(); render(); } }
   function cur(){ return NAV[NAV.length-1]; }
+  function saveNav(){ try{ sessionStorage.setItem('sp_nav', JSON.stringify(NAV)); }catch(e){} }
+  function syncBottom(){ var v=(NAV[0]&&NAV[0].view==='profile')?'profile':'exams';
+    document.getElementById('nav-exams').classList.toggle('active', v==='exams');
+    document.getElementById('nav-profile').classList.toggle('active', v==='profile'); }
 
   function setBar(title, showBack){ document.getElementById('viewTitle').textContent=title; document.getElementById('backBtn').style.display=showBack?'block':'none'; }
 
   async function render(){
     var s = cur(); var box=document.getElementById('content');
+    saveNav(); syncBottom();
     if(!(window.MockAPI && MockAPI.configured)){ box.innerHTML='<div class="state">⚠️ Not connected to Supabase yet.</div>'; return; }
     box.innerHTML='<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
     try {

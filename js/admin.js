@@ -13,6 +13,21 @@ function showScreen(name){
   ['categories','exams','exam'].forEach(function(s){ var el=document.getElementById('screen-'+s); if(el) el.style.display = (s===name)?'block':'none'; });
   var back=document.getElementById('adm-back'); if(back) back.style.display = (name==='categories')?'none':'block';
   window.scrollTo({ top:0, behavior:'smooth' });
+  saveAdminNav();
+}
+function saveAdminNav(){ try{ sessionStorage.setItem('sp_admin_nav', JSON.stringify({ screen:ADMIN.screen, catId:ADMIN.catId, examId:ADMIN.examId, fpath:ADMIN.fpath||[] })); }catch(e){} }
+async function adminRestoreNav(){
+  var s=null; try{ s=JSON.parse(sessionStorage.getItem('sp_admin_nav')||'null'); }catch(e){}
+  if(!s || !s.catId || !ADMIN.cats.find(function(c){return c.id===s.catId;})) return;
+  ADMIN.catId=s.catId; renderCategories(); clearExamForm(); setTitle(catName()); showScreen('exams'); await loadExams();
+  if(s.examId && ADMIN.exams.find(function(e){return e.id===s.examId;})){
+    ADMIN.examId=s.examId; renderExams(); var ex=ADMIN.exams.find(function(x){return x.id===s.examId;});
+    setTitle(ex?ex.name:'Exam'); showScreen('exam'); await loadFolders();
+    if(Array.isArray(s.fpath) && s.fpath.length){
+      var path=[]; for(var i=0;i<s.fpath.length;i++){ if(folderById(s.fpath[i])) path.push(s.fpath[i]); else break; }
+      ADMIN.fpath=path; renderFolders();
+    }
+  }
 }
 function setTitle(t){ var el=document.getElementById('adm-title'); if(el) el.textContent=t; }
 function catName(){ var c=ADMIN.cats.find(function(x){return x.id===ADMIN.catId;}); return c?c.name:'Exams'; }
@@ -50,7 +65,8 @@ async function adminShow(){
     login.style.display='none'; panel.style.display='block';
     document.getElementById('who').textContent = ADMIN.user.email || '';
     showScreen('categories'); setTitle('Exam Categories');
-    adminLoadCategories();
+    await adminLoadCategories();
+    await adminRestoreNav();
   } else { login.style.display='flex'; panel.style.display='none'; }
 }
 async function adminVerify(){
@@ -64,7 +80,7 @@ async function adminSignIn(){
   try { ADMIN.user=await MockAPI.signIn(em.trim(),pw); toast('✅ Signed in'); adminShow(); }
   catch(e){ if(err) err.textContent='Login failed: '+(e.message||e); }
 }
-async function adminSignOut(){ try{ await MockAPI.signOut(); }catch(e){} ADMIN.user=null; adminShow(); }
+async function adminSignOut(){ try{ await MockAPI.signOut(); }catch(e){} try{ sessionStorage.removeItem('sp_admin_nav'); }catch(e){} ADMIN.user=null; adminShow(); }
 
 /* ── ① Categories ── */
 async function adminLoadCategories(){
@@ -180,6 +196,7 @@ function renderFolders(){
   var loc=document.getElementById('addtest-loc');
   if(loc){ var path=(ADMIN.fpath||[]).map(function(id){var f=folderById(id);return f?f.name:'';}).join(' / '); loc.textContent = path||'(exam root)'; }
   renderTestsHere();
+  saveAdminNav();
 }
 function folderOpen(id){ (ADMIN.fpath=ADMIN.fpath||[]).push(id); renderFolders(); }
 function folderCrumb(idx){ ADMIN.fpath = idx<0 ? [] : ADMIN.fpath.slice(0, idx+1); renderFolders(); }
