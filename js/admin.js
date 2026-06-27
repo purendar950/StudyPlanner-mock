@@ -10,7 +10,7 @@ function slug(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').
 /* ── Screen navigation (Categories ▸ Exams ▸ Exam) ── */
 function showScreen(name){
   ADMIN.screen = name;
-  ['categories','exams','exam'].forEach(function(s){ var el=document.getElementById('screen-'+s); if(el) el.style.display = (s===name)?'block':'none'; });
+  ['categories','exams','exam','editor'].forEach(function(s){ var el=document.getElementById('screen-'+s); if(el) el.style.display = (s===name)?'block':'none'; });
   var back=document.getElementById('adm-back'); if(back) back.style.display = (name==='categories')?'none':'block';
   window.scrollTo({ top:0, behavior:'smooth' });
   saveAdminNav();
@@ -32,6 +32,7 @@ async function adminRestoreNav(){
 function setTitle(t){ var el=document.getElementById('adm-title'); if(el) el.textContent=t; }
 function catName(){ var c=ADMIN.cats.find(function(x){return x.id===ADMIN.catId;}); return c?c.name:'Exams'; }
 function admBack(){
+  if(ADMIN.screen==='editor'){ var ex0=ADMIN.exams.find(function(x){return x.id===ADMIN.examId;}); setTitle(ex0?ex0.name:'Exam'); showScreen('exam'); return; }
   if(ADMIN.screen==='exam'){
     // step up one folder level first, if we're inside folders
     if(ADMIN.fpath && ADMIN.fpath.length){ ADMIN.fpath.pop(); renderFolders(); return; }
@@ -247,7 +248,8 @@ function renderTestsHere(){
     return '<div class="item"><div style="flex:1;min-width:200px;">'+
       '<div class="t">'+esc(t.title||t.id)+' '+(t.is_free===false?'<span class="badge badge-paid">PAID</span>':'<span class="badge badge-free">FREE</span>')+(t.is_published?'':' <span class="badge badge-amber">Draft</span>')+'</div>'+
       '<div class="s">'+(t.total_questions||0)+' Qs · '+(t.total_sections||0)+' sections · ▶ <a href="'+url+'" target="_blank" style="color:var(--accent);">open</a></div></div>'+
-      '<div class="row"><button class="btn btn-sm" onclick="adminTogglePublish(\''+escA(t.id)+'\','+(!t.is_published)+')">'+(t.is_published?'👁 Unpublish':'🚀 Publish')+'</button>'+
+      '<div class="row"><button class="btn btn-sm" onclick="openEditor(\''+escA(t.id)+'\')">✏️ Edit</button>'+
+      '<button class="btn btn-sm" onclick="adminTogglePublish(\''+escA(t.id)+'\','+(!t.is_published)+')">'+(t.is_published?'👁 Unpublish':'🚀 Publish')+'</button>'+
       '<button class="btn btn-red btn-sm" onclick="adminDeleteTest(\''+escA(t.id)+'\')">🗑</button></div></div>';
   }).join('');
 }
@@ -496,6 +498,122 @@ async function adminRefreshTests(){
 }
 async function adminTogglePublish(id,val){ try{ await MockAPI.setPublished(id,val); toast('✅ Updated'); adminRefreshTests(); }catch(e){ toast('Failed: '+(e.message||e)); } }
 async function adminDeleteTest(id){ if(!confirm('Delete test "'+id+'"?'))return; try{ await MockAPI.deleteTest(id); toast('🗑 Deleted'); adminRefreshTests(); }catch(e){ toast('Failed: '+(e.message||e)); } }
+
+/* ════════════ QUIZ / QUESTION EDITOR ════════════ */
+var EDIT = { test:null, sectionsOrder:[], secMap:{}, flat:[], idx:0 };
+function gel(id){ return document.getElementById(id); }
+function gval(id){ var e=gel(id); return e?e.value:''; }
+function toBi(v){ if(v==null) return {en:'',hi:''}; if(typeof v==='object') return {en:v.en||'',hi:v.hi||''}; return {en:String(v),hi:''}; }
+function fromBi(b){ if(b.hi && String(b.hi).trim()) return {en:b.en,hi:b.hi}; return b.en; }
+
+async function openEditor(testId){
+  toast('Loading test…');
+  try{
+    var got=await MockAPI.getTest(testId);
+    var secMap={}, order=[];
+    (got.questions||[]).forEach(function(r){ var n=r.section_name||'Section 1'; if(!secMap[n]){secMap[n]=[];order.push(n);} secMap[n].push(r.data||{}); });
+    EDIT={ test:got.test, sectionsOrder:order, secMap:secMap, flat:[], idx:0 };
+    order.forEach(function(n){ secMap[n].forEach(function(q){ EDIT.flat.push({ sec:n, q:q, optN:0 }); }); });
+    EDIT.flat.forEach(function(w){ var n=0; for(var k=1;k<=5;k++){ if(w.q['option_'+k]!=null && w.q['option_'+k]!=='') n=k; } w.optN = n<2?4:n; });
+    setTitle('Edit: '+(got.test.title||testId)); showScreen('editor');
+    renderEditorTest();
+    if(EDIT.flat.length){ renderEditorQuestion(0); } else { gel('ed-qbox').innerHTML='<div class="empty">No questions in this test.</div>'; }
+    gel('ed-save-msg').textContent='';
+  }catch(e){ toast('Load failed: '+(e.message||e)); }
+}
+function renderEditorTest(){
+  var t=EDIT.test||{};
+  gel('ed-title').value=t.title||'';
+  gel('ed-cmarks').value=(t.correct_score!=null?t.correct_score:2);
+  gel('ed-nmarks').value=(t.negative_score!=null?t.negative_score:0.5);
+  gel('ed-time').value=(t.section_time_min!=null?t.section_time_min:15);
+  gel('ed-free').value=(t.is_free===false?'paid':'free');
+  gel('ed-pub').value=(t.is_published===false?'0':'1');
+  // jump dropdown
+  var jump=gel('ed-jump');
+  jump.innerHTML=EDIT.flat.map(function(w,i){ return '<option value="'+i+'">Q'+(i+1)+' · '+esc((w.sec||'').slice(0,14))+'</option>'; }).join('');
+}
+function imgRow(label, url, upFn, clrFn){
+  return '<div style="margin:6px 0;"><div class="lbl">'+label+'</div>'+
+    (url?'<img src="'+esc(url)+'" style="max-height:70px;border:1px solid var(--border);border-radius:6px;display:block;margin:4px 0;">':'')+
+    '<button class="btn btn-sm" onclick="'+upFn+'">⬆ Upload image</button> '+
+    (url?'<button class="btn btn-red btn-sm" onclick="'+clrFn+'">Clear</button>':'')+'</div>';
+}
+function renderEditorQuestion(i){
+  edApplySilent();
+  EDIT.idx=i;
+  var w=EDIT.flat[i]; var q=w.q;
+  gel('ed-qpos').textContent='Q '+(i+1)+' / '+EDIT.flat.length+'  ·  '+(w.sec||'');
+  gel('ed-jump').value=String(i);
+  var qb=toBi(q.question), eb=toBi(q.explanation);
+  var h='';
+  h+='<label class="lbl">Question (English)</label><textarea id="ed-q-en" oninput="edApply()" style="min-height:64px;">'+esc(qb.en)+'</textarea>';
+  h+='<label class="lbl">Question (Hindi, optional)</label><textarea id="ed-q-hi" oninput="edApply()" style="min-height:64px;">'+esc(qb.hi)+'</textarea>';
+  h+=imgRow('Question image', q.question_image, "edImg('question',0)", "edClear('question',0)");
+  h+='<div style="font-weight:700;margin:12px 0 6px;">Options (pick the correct one)</div>';
+  for(var k=1;k<=w.optN;k++){
+    var ob=toBi(q['option_'+k]);
+    h+='<div style="border:1px solid var(--border);border-radius:8px;padding:8px;margin-bottom:8px;">';
+    h+='<label class="muted"><input type="radio" name="ed-correct" value="'+k+'" '+(String(q.answer)===String(k)?'checked':'')+' onchange="edApply()"> Correct answer</label>';
+    h+='<input type="text" id="ed-opt-en-'+k+'" placeholder="Option '+k+' (English)" value="'+esc(ob.en)+'" oninput="edApply()" style="width:100%;margin-top:4px;">';
+    h+='<input type="text" id="ed-opt-hi-'+k+'" placeholder="Option '+k+' (Hindi)" value="'+esc(ob.hi)+'" oninput="edApply()" style="width:100%;margin-top:4px;">';
+    h+=imgRow('Option '+k+' image', q['option_image_'+k], "edImg('option',"+k+")", "edClear('option',"+k+")");
+    if(k===w.optN && w.optN>2) h+='<button class="btn btn-red btn-sm" style="margin-top:6px;" onclick="edRemoveOption()">Remove this option</button>';
+    h+='</div>';
+  }
+  if(w.optN<5) h+='<button class="btn btn-sm" onclick="edAddOption()">+ Add option</button>';
+  h+='<label class="lbl" style="margin-top:12px;">Explanation (English)</label><textarea id="ed-exp-en" oninput="edApply()" style="min-height:60px;">'+esc(eb.en)+'</textarea>';
+  h+='<label class="lbl">Explanation (Hindi, optional)</label><textarea id="ed-exp-hi" oninput="edApply()" style="min-height:60px;">'+esc(eb.hi)+'</textarea>';
+  h+=imgRow('Solution image', q.solution_image, "edImg('solution',0)", "edClear('solution',0)");
+  gel('ed-qbox').innerHTML=h;
+}
+/* Read the visible inputs back into the current question object */
+function edApply(){
+  var w=EDIT.flat[EDIT.idx]; if(!w) return; var q=w.q;
+  if(gel('ed-q-en')) q.question=fromBi({en:gval('ed-q-en'),hi:gval('ed-q-hi')});
+  for(var k=1;k<=w.optN;k++){ if(gel('ed-opt-en-'+k)) q['option_'+k]=fromBi({en:gval('ed-opt-en-'+k),hi:gval('ed-opt-hi-'+k)}); }
+  if(gel('ed-exp-en')) q.explanation=fromBi({en:gval('ed-exp-en'),hi:gval('ed-exp-hi')});
+  var r=document.querySelector('input[name=ed-correct]:checked'); if(r) q.answer=r.value;
+}
+function edApplySilent(){ try{ if(gel('ed-q-en')) edApply(); }catch(e){} }
+function edPrev(){ if(EDIT.idx>0) renderEditorQuestion(EDIT.idx-1); }
+function edNext(){ if(EDIT.idx<EDIT.flat.length-1) renderEditorQuestion(EDIT.idx+1); }
+function edJump(v){ var i=parseInt(v,10); if(!isNaN(i)) renderEditorQuestion(i); }
+function edAddOption(){ edApply(); var w=EDIT.flat[EDIT.idx]; if(w.optN<5){ w.optN++; if(w.q['option_'+w.optN]==null) w.q['option_'+w.optN]=''; } renderEditorQuestion(EDIT.idx); }
+function edRemoveOption(){ edApply(); var w=EDIT.flat[EDIT.idx]; if(w.optN>2){ delete w.q['option_'+w.optN]; delete w.q['option_image_'+w.optN]; if(String(w.q.answer)===String(w.optN)) w.q.answer='1'; w.optN--; } renderEditorQuestion(EDIT.idx); }
+function edImg(kind, idx){
+  edApply();
+  var inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+  inp.onchange=async function(){ var f=inp.files&&inp.files[0]; if(!f)return;
+    try{ toast('⏳ Uploading image…'); var path='q/'+Date.now()+'-'+f.name.replace(/[^a-zA-Z0-9._-]/g,'_'); var url=await MockAPI.uploadImage(f,path);
+      var q=EDIT.flat[EDIT.idx].q;
+      if(kind==='question') q.question_image=url; else if(kind==='solution') q.solution_image=url; else q['option_image_'+idx]=url;
+      toast('✅ Image added'); renderEditorQuestion(EDIT.idx);
+    }catch(e){ toast('Image upload failed: '+(e.message||e)); }
+  };
+  inp.click();
+}
+function edClear(kind, idx){ edApply(); var q=EDIT.flat[EDIT.idx].q;
+  if(kind==='question') q.question_image=''; else if(kind==='solution') q.solution_image=''; else q['option_image_'+idx]='';
+  renderEditorQuestion(EDIT.idx); }
+async function saveEditor(){
+  edApply();
+  var t=EDIT.test||{};
+  var msg=gel('ed-save-msg'); if(msg) msg.textContent='⏳ Saving…';
+  var payloadTest={
+    id:t.id, title:gval('ed-title')||t.title, exam_id:t.exam_id, folder_id:t.folder_id,
+    correct_score:Number(gval('ed-cmarks'))||0, negative_score:Number(gval('ed-nmarks'))||0,
+    section_time_min:Number(gval('ed-time'))||15,
+    is_free: gel('ed-free').value!=='paid', is_published: gel('ed-pub').value==='1'
+  };
+  var sections=EDIT.sectionsOrder.map(function(n){ return { name:n, time_min:payloadTest.section_time_min, questions:EDIT.secMap[n] }; });
+  try{
+    await MockAPI.uploadTest({ test:payloadTest, sections:sections });
+    if(msg) msg.textContent='Saved ✓';
+    toast('✅ Test saved');
+    try{ ADMIN.allTests=await MockAPI.listAllTests(ADMIN.examId); }catch(e){}
+  }catch(e){ if(msg) msg.textContent=''; toast('Save failed: '+(e.message||e)); }
+}
 
 /* ── Images ── */
 async function adminUploadImage(input){
