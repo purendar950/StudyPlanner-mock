@@ -258,11 +258,43 @@ function renderTestsHere(){
 function adminTogglePaste(){ var ta=document.getElementById('mock-json-text'); if(ta) ta.style.display = ta.style.display==='none'?'block':'none'; }
 function adminParseFile(input){ var f=input.files&&input.files[0]; if(!f)return; var r=new FileReader(); r.onload=function(){ adminTryParse(r.result); }; r.readAsText(f); }
 function adminParseText(){ var ta=document.getElementById('mock-json-text'); if(ta) adminTryParse(ta.value); }
+function adminParseJsonLenient(raw){
+  try{ return { ok:true, obj:JSON.parse(raw), trailing:'' }; }
+  catch(firstErr){
+    // Some copied ProMocks files contain a valid JSON object followed by pasted notes/URLs.
+    // Extract the first balanced root object so the admin can still import the mock.
+    var start=String(raw).indexOf('{');
+    if(start<0) return { ok:false, error:firstErr };
+    var depth=0, inStr=false, escNext=false;
+    for(var i=start;i<raw.length;i++){
+      var ch=raw[i];
+      if(inStr){
+        if(escNext) escNext=false;
+        else if(ch==='\\') escNext=true;
+        else if(ch==='"') inStr=false;
+      } else {
+        if(ch==='"') inStr=true;
+        else if(ch==='{') depth++;
+        else if(ch==='}'){
+          depth--;
+          if(depth===0){
+            try{ return { ok:true, obj:JSON.parse(raw.slice(start,i+1)), trailing:raw.slice(i+1).trim() }; }
+            catch(e){ return { ok:false, error:e }; }
+          }
+        }
+      }
+    }
+    return { ok:false, error:firstErr };
+  }
+}
 function adminTryParse(raw){
   var prev=document.getElementById('mock-preview'); ADMIN.parsed=null;
   if(!raw||!raw.trim()){ if(prev) prev.innerHTML=''; return; }
-  var obj; try{ obj=JSON.parse(raw); }catch(e){ prev.innerHTML='<div class="empty" style="color:var(--red);">❌ Invalid JSON: '+esc(e.message)+'</div>'; return; }
+  var parsed=adminParseJsonLenient(raw), obj;
+  if(!parsed.ok){ prev.innerHTML='<div class="empty" style="color:var(--red);">❌ Invalid JSON: '+esc(parsed.error.message||parsed.error)+'</div>'; return; }
+  obj=parsed.obj;
   var res=adminNormalize(obj);
+  if(parsed.trailing) res.warnings.push('Ignored trailing text after JSON.');
   if(!res.ok){ prev.innerHTML='<div class="empty" style="color:var(--red);">❌ '+res.errors.map(esc).join('<br>')+'</div>'; return; }
   ADMIN.parsed={ test:res.test, sections:res.sections };
   var totalQ=res.sections.reduce(function(s,sec){return s+sec.questions.length;},0);
@@ -317,13 +349,30 @@ function adminNormalize(obj){
   // ── Normalize every question to the engine shape ──
   sections.forEach(function(sec){ sec.questions=(sec.questions||[]).map(normalizeQuestion); });
 
+  // ProMocks exports may contain a few placeholder rows with blank options/answers.
+  // Keep the valid questions importable and report skipped rows in the preview.
+  var isProMocks = obj.series_id!=null && obj.series_name!=null && Array.isArray(obj.questions);
+
   // ── Validate ──
-  var total=0;
-  sections.forEach(function(sec){ if(!sec.questions.length) warnings.push('Section "'+sec.name+'" has no questions.');
-    sec.questions.forEach(function(q,qi){ total++; var oc=0; for(var n=1;n<=5;n++) if(q['option_'+n]!=null&&q['option_'+n]!=='') oc++;
+  var total=0, skipped=0;
+  sections.forEach(function(sec){
+    var kept=[];
+    (sec.questions||[]).forEach(function(q,qi){
+      var oc=0; for(var n=1;n<=5;n++) if(q['option_'+n]!=null&&q['option_'+n]!=='') oc++;
+      var miss=[];
+      if(oc<2) miss.push('needs at least 2 options');
+      if(q.answer==null||q.answer==='') miss.push('missing answer');
+      if(q.question==null||q.question==='') miss.push('missing question');
+      if(miss.length && isProMocks){ skipped++; warnings.push('Skipped Q'+(qi+1)+' in "'+sec.name+'": '+miss.join(', ')+'.'); return; }
+      total++; kept.push(q);
       if(oc<2) errors.push('Q'+(qi+1)+' in "'+sec.name+'": needs at least 2 options.');
       if(q.answer==null||q.answer==='') errors.push('Q'+(qi+1)+' in "'+sec.name+'": missing "answer".');
-      if(q.question==null||q.question==='') errors.push('Q'+(qi+1)+' in "'+sec.name+'": missing "question".'); }); });
+      if(q.question==null||q.question==='') errors.push('Q'+(qi+1)+' in "'+sec.name+'": missing "question".');
+    });
+    sec.questions=kept;
+    if(!sec.questions.length) warnings.push('Section "'+sec.name+'" has no importable questions.');
+  });
+  if(skipped) warnings.push('Skipped '+skipped+' incomplete ProMocks placeholder question(s).');
   if(obj.total!=null && Number(obj.total)!==total) warnings.push('Declared total '+obj.total+' does not match parsed questions '+total+'.');
   if(sections.length&&total===0) errors.push('No questions found.');
   if(errors.length) return {ok:false,errors:errors,warnings:warnings};
