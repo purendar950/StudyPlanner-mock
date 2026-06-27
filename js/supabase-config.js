@@ -225,7 +225,8 @@ window.SUPABASE_CONFIG = Object.freeze({
     async listFolders(examId) {
       var c = requireClient();
       var r = await c.from("folders").select("*").eq("exam_id", examId)
-        .order("order_index", { ascending: true });
+        .order("order_index", { ascending: true })
+        .order("created_at", { ascending: true });
       if (r.error) throw r.error; return r.data || [];
     },
     /* Everything needed to render one exam page: its folders + its published tests */
