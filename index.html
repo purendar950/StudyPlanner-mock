@@ -240,6 +240,7 @@
 
   var SB = window._supabase || null;
   var CURRENT_USER = null, ATTEMPTED = {}, pendingTestId = null;
+  var shellBootUserId = null, shellBootPromise = null;
 
   /* ── Session ── */
   function userName(u){ return (u&&u.user_metadata&&u.user_metadata.full_name)||(u&&u.email)||'Student'; }
@@ -250,16 +251,24 @@
     b.innerHTML = CURRENT_USER ? '<span class="hi">Hi, '+esc(userName(CURRENT_USER))+'</span><button class="btn btn-ghost" onclick="doLogout()">Log out</button>'
       : '<button class="btn btn-green" onclick="openAuth(\'login\')">Sign In</button>'; }
 
-  function renderShell(){
+  async function renderShell(){
     var loggedIn = !!CURRENT_USER;
     document.getElementById('hero').style.display = loggedIn ? 'none' : 'block';
     document.getElementById('app').style.display  = loggedIn ? 'block' : 'none';
     document.getElementById('bnav').style.display  = loggedIn ? 'flex' : 'none';
-    if(loggedIn){ loadAttempts().then(function(){
+    if(!loggedIn){ shellBootUserId=null; shellBootPromise=null; NAV=[]; return; }
+
+    var uid = CURRENT_USER.id;
+    if(shellBootPromise && shellBootUserId===uid) return shellBootPromise;
+    if(shellBootUserId===uid && NAV.length){ syncBottom(); return; }
+
+    shellBootUserId = uid;
+    shellBootPromise = loadAttempts().then(function(){
       var saved=null; try{ saved=JSON.parse(sessionStorage.getItem('sp_nav')||'null'); }catch(e){}
       if(saved && saved.length){ NAV=saved; syncBottom(); render(); }
       else navTo('exams');
-    }); }
+    }).finally(function(){ shellBootPromise=null; });
+    return shellBootPromise;
   }
 
   /* ── Auth modal ── */
@@ -271,7 +280,7 @@
     var email=(document.getElementById('li-email').value||'').trim(), pass=document.getElementById('li-pass').value||'';
     if(!email||!pass){ m.className='msg err'; m.textContent='Enter email and password.'; return; }
     try{ var r=await SB.auth.signInWithPassword({email:email,password:pass}); if(r.error) throw r.error;
-      CURRENT_USER=r.data.user; syncIdentity(); renderAcct(); closeAuth(); renderShell();
+      CURRENT_USER=r.data.user; syncIdentity(); renderAcct(); closeAuth(); await renderShell();
       if(pendingTestId){ var id=pendingTestId; pendingTestId=null; startTest(id); } }
     catch(e){ m.className='msg err'; m.textContent=e.message||'Login failed.'; } }
   async function doSignup(){ var m=document.getElementById('su-msg'); m.className='msg'; m.textContent='Creating account…';
@@ -279,7 +288,7 @@
     if(!name||!email||!pass){ m.className='msg err'; m.textContent='Fill all fields.'; return; }
     if(pass.length<6){ m.className='msg err'; m.textContent='Password must be at least 6 characters.'; return; }
     try{ var r=await SB.auth.signUp({email:email,password:pass,options:{data:{full_name:name}}}); if(r.error) throw r.error;
-      if(r.data.session){ CURRENT_USER=r.data.user; syncIdentity(); renderAcct(); closeAuth(); renderShell(); if(pendingTestId){ var id=pendingTestId; pendingTestId=null; startTest(id);} }
+      if(r.data.session){ CURRENT_USER=r.data.user; syncIdentity(); renderAcct(); closeAuth(); await renderShell(); if(pendingTestId){ var id=pendingTestId; pendingTestId=null; startTest(id);} }
       else { m.className='msg ok'; m.textContent='Account created! Check your email to confirm, then sign in.'; authTab('login'); } }
     catch(e){ m.className='msg err'; m.textContent=e.message||'Sign up failed.'; } }
   async function doGoogle(){
