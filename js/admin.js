@@ -409,6 +409,31 @@ async function createSubjectSectionals(res, freeFlag){
   return made;
 }
 
+/* Generate subject-wise sectionals from the full mocks already in the current folder. */
+async function generateSectionalsHere(){
+  if(!ADMIN.examId) return;
+  var here=(ADMIN.allTests||[]).filter(function(t){ return (t.folder_id||null)===curFolderId(); });
+  if(!here.length){ toast('No tests in this folder.'); return; }
+  if(!confirm('Create subject-wise sectional tests from '+here.length+' test(s) in this folder?\nThey will go into the sibling "Sectionals" folder.')) return;
+  var rep=document.getElementById('sec-gen-report');
+  var made=0, fail=0;
+  for(var i=0;i<here.length;i++){
+    if(rep) rep.textContent='⏳ '+(i+1)+' / '+here.length+'…';
+    try{
+      var got=await MockAPI.getTest(here[i].id);
+      var secMap={}, order=[];
+      got.questions.forEach(function(r){ var n=r.section_name||'Section 1'; if(!secMap[n]){secMap[n]=[];order.push(n);} secMap[n].push(r.data); });
+      var res={ test:{ id:got.test.id, title:got.test.title, correct_score:got.test.correct_score, negative_score:got.test.negative_score, section_time_min:got.test.section_time_min },
+        sections: order.map(function(n){ return { name:n, time_min:got.test.section_time_min, questions:secMap[n] }; }) };
+      made += await createSubjectSectionals(res, here[i].is_free!==false);
+    }catch(e){ fail++; }
+  }
+  try{ ADMIN.folders=await MockAPI.listFolders(ADMIN.examId); ADMIN.allTests=await MockAPI.listAllTests(ADMIN.examId); }catch(e){}
+  renderFolders();
+  if(rep) rep.textContent='✅ Created '+made+' sectional tests'+(fail?(' · '+fail+' failed'):'');
+  toast('✅ '+made+' sectionals created'+(fail?(' · '+fail+' failed'):''));
+}
+
 /* ── Bulk import: upload many JSON mocks into the CURRENT folder (no sub-folders created), with per-file report ── */
 async function bulkImport(input){
   if(!ADMIN.examId){ toast('Open an exam first.'); return; }

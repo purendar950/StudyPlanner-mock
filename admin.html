@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="css/style.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase-config.js?v=13"></script>
+<script src="js/supabase-config.js?v=14"></script>
 <style>
   .container { max-width: 1000px; padding-top: 1.2rem; padding-bottom: 4rem; }
   .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.2rem; margin-bottom:1.2rem; }
@@ -182,8 +182,12 @@
     <div class="card">
       <div class="row" style="justify-content:space-between;">
         <h3 style="margin:0;">📝 Tests in this folder</h3>
-        <button class="btn btn-sm" onclick="adminRefreshTests()">↻ Refresh</button>
+        <div class="row">
+          <button class="btn btn-sm" onclick="generateSectionalsHere()">⚡ Make sectionals from these</button>
+          <button class="btn btn-sm" onclick="adminRefreshTests()">↻ Refresh</button>
+        </div>
       </div>
+      <div id="sec-gen-report" class="muted" style="margin:6px 0 0;"></div>
       <div id="mock-tests-list" style="margin-top:10px;"><div class="empty">—</div></div>
     </div>
 
@@ -207,6 +211,6 @@
   }
   if (!localStorage.getItem('mmh_theme')) document.documentElement.setAttribute('data-theme', 'dark');
 </script>
-<script src="js/admin.js?v=13"></script>
+<script src="js/admin.js?v=14"></script>
 </body>
 </html>
