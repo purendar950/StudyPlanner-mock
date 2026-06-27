@@ -281,8 +281,8 @@ function adminNormalize(obj){
   var timer = null;
   if(!obj.test){
     var m=obj.meta||{};
-    test.title = obj.title || m.title || test.title;
-    test.id = obj.quiz_id || m.id || obj.id || test.id;
+    test.title = obj.title || obj.series_name || m.title || test.title;
+    test.id = obj.quiz_id || obj.series_id || m.id || obj.id || test.id;
     var cs=(m.correct_score!=null)?m.correct_score:(m.marksPerQ!=null?m.marksPerQ:null);
     var ns=(m.negative_score!=null)?m.negative_score:(m.neg!=null?m.neg:null);
     if(cs!=null) test.correct_score=cs;
@@ -330,15 +330,24 @@ function adminNormalize(obj){
 }
 
 /* Convert one question of any supported shape to the engine shape:
-   options[] → option_1..N ; solution → explanation ; answer letter → number. */
+   qid → id ; options[] → option_1..N ; solution → explanation ; marks → positive_marks ;
+   answer letter/text/index → 1-based option number required by the test engine. */
 function normalizeQuestion(q){
   q = Object.assign({}, q);
+  if(q.id==null && q.qid!=null) q.id=String(q.qid);
+  if(q.topic==null && q.topic_id!=null) q.topic=String(q.topic_id);
+  if(q.positive_marks==null && q.marks!=null) q.positive_marks=Number(q.marks);
+
   if(Array.isArray(q.options)){
     q.options.forEach(function(opt,i){ if(q['option_'+(i+1)]==null) q['option_'+(i+1)]=opt; });
     delete q.options;
   }
   if((q.explanation==null||q.explanation==='') && q.solution!=null) q.explanation=q.solution;
-  // Answer resolution. Supported: answer (1-based number or A/B/C/D) | correct (0-based index) | answer_index (0-based)
+
+  var optionVals=[];
+  for(var n=1;n<=5;n++) if(q['option_'+n]!=null && q['option_'+n]!=='') optionVals.push(String(q['option_'+n]).trim());
+
+  // Answer resolution. Supported: answer (1-based number, A/B/C/D, or exact option text) | correct (0-based index) | answer_index (0-based)
   if((q.answer==null||q.answer==='')){
     if(q.correct!=null){
       if(/^\d+$/.test(String(q.correct))) q.answer=String(Number(q.correct)+1);   // correct is 0-based
@@ -350,7 +359,11 @@ function normalizeQuestion(q){
   if(q.answer!=null){
     var a=String(q.answer).trim();
     if(/^[A-Ea-e]$/.test(a)) q.answer=String('abcde'.indexOf(a.toLowerCase())+1);   // A/B/C/D → 1/2/3/4
-    else q.answer=a;
+    else {
+      var exactIndex=optionVals.findIndex(function(opt){ return opt===a; });
+      if(exactIndex>=0) q.answer=String(exactIndex+1);
+      else q.answer=a;
+    }
   }
   return q;
 }
