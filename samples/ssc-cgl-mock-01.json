@@ -1,0 +1,190 @@
+{
+  "test": {
+    "id": "ssc-cgl-mock-01",
+    "title": "SSC CGL Tier 1 — Mock 01",
+    "exam": "cgl",
+    "tier": "t1",
+    "correct_score": 2,
+    "negative_score": 0.5,
+    "section_time_min": 15,
+    "is_published": true
+  },
+  "sections": [
+    {
+      "name": "General Intelligence & Reasoning",
+      "time_min": 15,
+      "questions": [
+        {
+          "id": "R1",
+          "question": { "en": "Find the missing number: 2, 6, 12, 20, 30, ?", "hi": "लुप्त संख्या ज्ञात कीजिए: 2, 6, 12, 20, 30, ?" },
+          "option_1": "40", "option_2": "42", "option_3": "44", "option_4": "46",
+          "answer": "2",
+          "explanation": { "en": "Differences are 4,6,8,10,12 → 30+12 = 42.", "hi": "अंतर 4,6,8,10,12 हैं → 30+12 = 42।" }
+        },
+        {
+          "id": "R2",
+          "question": { "en": "If CAT is coded as 3-1-20, how is DOG coded?", "hi": "यदि CAT को 3-1-20 लिखा जाता है, तो DOG को कैसे लिखेंगे?" },
+          "option_1": "4-15-7", "option_2": "4-14-7", "option_3": "3-15-7", "option_4": "4-15-8",
+          "answer": "1",
+          "explanation": { "en": "Letters by position: D=4, O=15, G=7.", "hi": "अक्षरों की स्थिति: D=4, O=15, G=7।" }
+        },
+        {
+          "id": "R3",
+          "question": { "en": "Pointing to a man, Sita said, 'He is the son of my grandfather's only son.' How is the man related to Sita?", "hi": "एक व्यक्ति की ओर इशारा करते हुए सीता ने कहा, 'वह मेरे दादा के इकलौते पुत्र का पुत्र है।' वह व्यक्ति सीता से कैसे संबंधित है?" },
+          "option_1": "Father", "option_2": "Uncle", "option_3": "Brother", "option_4": "Cousin",
+          "answer": "3",
+          "explanation": { "en": "Grandfather's only son = Sita's father; his son = Sita's brother.", "hi": "दादा का इकलौता पुत्र = सीता के पिता; उनका पुत्र = सीता का भाई।" }
+        },
+        {
+          "id": "R4",
+          "question": { "en": "Choose the odd one out.", "hi": "विषम को चुनिए।" },
+          "option_1": "Square", "option_2": "Triangle", "option_3": "Rectangle", "option_4": "Sphere",
+          "answer": "4",
+          "explanation": { "en": "Sphere is 3-D; the rest are 2-D shapes.", "hi": "गोला त्रि-आयामी है; बाकी द्वि-आयामी आकृतियाँ हैं।" }
+        },
+        {
+          "id": "R5",
+          "question": { "en": "Complete the series: AZ, BY, CX, ?", "hi": "श्रृंखला पूरी कीजिए: AZ, BY, CX, ?" },
+          "option_1": "DW", "option_2": "DV", "option_3": "EW", "option_4": "DX",
+          "answer": "1",
+          "explanation": { "en": "First letter +1 (A,B,C,D), second letter -1 (Z,Y,X,W).", "hi": "पहला अक्षर +1 (A,B,C,D), दूसरा अक्षर -1 (Z,Y,X,W)।" }
+        }
+      ]
+    },
+    {
+      "name": "General Awareness",
+      "time_min": 15,
+      "questions": [
+        {
+          "id": "G1",
+          "question": { "en": "Who is known as the 'Father of the Indian Constitution'?", "hi": "'भारतीय संविधान के जनक' किसे कहा जाता है?" },
+          "option_1": { "en": "Mahatma Gandhi", "hi": "महात्मा गांधी" },
+          "option_2": { "en": "B. R. Ambedkar", "hi": "बी. आर. अंबेडकर" },
+          "option_3": { "en": "Jawaharlal Nehru", "hi": "जवाहरलाल नेहरू" },
+          "option_4": { "en": "Sardar Patel", "hi": "सरदार पटेल" },
+          "answer": "2",
+          "explanation": { "en": "Dr. B. R. Ambedkar chaired the drafting committee.", "hi": "डॉ. बी. आर. अंबेडकर प्रारूप समिति के अध्यक्ष थे।" }
+        },
+        {
+          "id": "G2",
+          "question": { "en": "The Tropic of Cancer does NOT pass through which state?", "hi": "कर्क रेखा किस राज्य से होकर नहीं गुजरती?" },
+          "option_1": { "en": "Gujarat", "hi": "गुजरात" },
+          "option_2": { "en": "Rajasthan", "hi": "राजस्थान" },
+          "option_3": { "en": "Madhya Pradesh", "hi": "मध्य प्रदेश" },
+          "option_4": { "en": "Kerala", "hi": "केरल" },
+          "answer": "4",
+          "explanation": { "en": "It passes through 8 states; Kerala is not one of them.", "hi": "यह 8 राज्यों से गुजरती है; केरल उनमें नहीं है।" }
+        },
+        {
+          "id": "G3",
+          "question": { "en": "Which gas is most abundant in Earth's atmosphere?", "hi": "पृथ्वी के वायुमंडल में सबसे अधिक मात्रा में कौन-सी गैस है?" },
+          "option_1": { "en": "Oxygen", "hi": "ऑक्सीजन" },
+          "option_2": { "en": "Carbon dioxide", "hi": "कार्बन डाइऑक्साइड" },
+          "option_3": { "en": "Nitrogen", "hi": "नाइट्रोजन" },
+          "option_4": { "en": "Hydrogen", "hi": "हाइड्रोजन" },
+          "answer": "3",
+          "explanation": { "en": "Nitrogen makes up about 78% of the atmosphere.", "hi": "नाइट्रोजन वायुमंडल का लगभग 78% भाग है।" }
+        },
+        {
+          "id": "G4",
+          "question": { "en": "RBI was established in which year?", "hi": "भारतीय रिज़र्व बैंक की स्थापना किस वर्ष हुई?" },
+          "option_1": "1935", "option_2": "1947", "option_3": "1949", "option_4": "1950",
+          "answer": "1",
+          "explanation": { "en": "The Reserve Bank of India was established on 1 April 1935.", "hi": "भारतीय रिज़र्व बैंक की स्थापना 1 अप्रैल 1935 को हुई।" }
+        },
+        {
+          "id": "G5",
+          "question": { "en": "Which vitamin is produced when skin is exposed to sunlight?", "hi": "त्वचा के सूर्य के प्रकाश के संपर्क में आने पर कौन-सा विटामिन बनता है?" },
+          "option_1": { "en": "Vitamin A", "hi": "विटामिन A" },
+          "option_2": { "en": "Vitamin C", "hi": "विटामिन C" },
+          "option_3": { "en": "Vitamin D", "hi": "विटामिन D" },
+          "option_4": { "en": "Vitamin K", "hi": "विटामिन K" },
+          "answer": "3",
+          "explanation": { "en": "Sunlight helps the skin synthesise Vitamin D.", "hi": "सूर्य का प्रकाश त्वचा में विटामिन D के निर्माण में मदद करता है।" }
+        }
+      ]
+    },
+    {
+      "name": "Quantitative Aptitude",
+      "time_min": 15,
+      "questions": [
+        {
+          "id": "Q1",
+          "question": { "en": "What is 25% of 480?", "hi": "480 का 25% कितना है?" },
+          "option_1": "100", "option_2": "110", "option_3": "120", "option_4": "130",
+          "answer": "3",
+          "explanation": { "en": "25% of 480 = 480/4 = 120.", "hi": "480 का 25% = 480/4 = 120।" }
+        },
+        {
+          "id": "Q2",
+          "question": { "en": "A train 120 m long crosses a pole in 6 seconds. Its speed is:", "hi": "120 मीटर लंबी एक रेलगाड़ी एक खंभे को 6 सेकंड में पार करती है। उसकी चाल है:" },
+          "option_1": "60 km/h", "option_2": "72 km/h", "option_3": "80 km/h", "option_4": "90 km/h",
+          "answer": "2",
+          "explanation": { "en": "Speed = 120/6 = 20 m/s = 20 × 18/5 = 72 km/h.", "hi": "चाल = 120/6 = 20 मी/से = 20 × 18/5 = 72 किमी/घंटा।" }
+        },
+        {
+          "id": "Q3",
+          "question": { "en": "The average of 5 consecutive numbers is 18. The largest number is:", "hi": "5 क्रमागत संख्याओं का औसत 18 है। सबसे बड़ी संख्या है:" },
+          "option_1": "18", "option_2": "19", "option_3": "20", "option_4": "21",
+          "answer": "3",
+          "explanation": { "en": "Numbers are 16,17,18,19,20; largest = 20.", "hi": "संख्याएँ 16,17,18,19,20 हैं; सबसे बड़ी = 20।" }
+        },
+        {
+          "id": "Q4",
+          "question": { "en": "If the simple interest on ₹2000 for 2 years is ₹240, the rate of interest per annum is:", "hi": "यदि ₹2000 पर 2 वर्ष का साधारण ब्याज ₹240 है, तो प्रति वर्ष ब्याज दर है:" },
+          "option_1": "5%", "option_2": "6%", "option_3": "7%", "option_4": "8%",
+          "answer": "2",
+          "explanation": { "en": "R = (SI×100)/(P×T) = (240×100)/(2000×2) = 6%.", "hi": "R = (SI×100)/(P×T) = (240×100)/(2000×2) = 6%।" }
+        },
+        {
+          "id": "Q5",
+          "question": { "en": "The value of 15 × 8 − 40 ÷ 5 is:", "hi": "15 × 8 − 40 ÷ 5 का मान है:" },
+          "option_1": "112", "option_2": "104", "option_3": "120", "option_4": "96",
+          "answer": "1",
+          "explanation": { "en": "120 − 8 = 112 (BODMAS).", "hi": "120 − 8 = 112 (BODMAS)।" }
+        }
+      ]
+    },
+    {
+      "name": "English Comprehension",
+      "time_min": 15,
+      "questions": [
+        {
+          "id": "E1",
+          "question": "Choose the correct synonym of 'ABUNDANT'.",
+          "option_1": "Scarce", "option_2": "Plentiful", "option_3": "Empty", "option_4": "Rare",
+          "answer": "2",
+          "explanation": "'Abundant' means existing in large quantities = plentiful."
+        },
+        {
+          "id": "E2",
+          "question": "Choose the correctly spelt word.",
+          "option_1": "Recieve", "option_2": "Receive", "option_3": "Receeve", "option_4": "Receve",
+          "answer": "2",
+          "explanation": "The rule 'i before e except after c' gives 'receive'."
+        },
+        {
+          "id": "E3",
+          "question": "Fill in the blank: She has been working here ____ 2015.",
+          "option_1": "for", "option_2": "from", "option_3": "since", "option_4": "by",
+          "answer": "3",
+          "explanation": "'Since' is used with a point in time (2015)."
+        },
+        {
+          "id": "E4",
+          "question": "Choose the antonym of 'GENEROUS'.",
+          "option_1": "Kind", "option_2": "Liberal", "option_3": "Stingy", "option_4": "Giving",
+          "answer": "3",
+          "explanation": "'Generous' (giving) is the opposite of 'stingy' (mean)."
+        },
+        {
+          "id": "E5",
+          "question": "Identify the correct sentence.",
+          "option_1": "He don't like tea.", "option_2": "He doesn't likes tea.", "option_3": "He doesn't like tea.", "option_4": "He not like tea.",
+          "answer": "3",
+          "explanation": "With 'doesn't', the base verb 'like' is used."
+        }
+      ]
+    }
+  ]
+}
