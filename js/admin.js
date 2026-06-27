@@ -188,11 +188,31 @@ async function addFolder(){
   if(!ADMIN.examId){ toast('Open an exam first.'); return; }
   var name=(document.getElementById('folder-name').value||'').trim();
   if(!name){ toast('Folder name required.'); return; }
-  try { await MockAPI.createFolder({ exam_id:ADMIN.examId, parent_id:curFolderId(), name:name, order_index:childrenOf(curFolderId()).length });
+  var copyChk = document.getElementById('folder-copy');
+  var doCopy = copyChk ? copyChk.checked : false;
+  try {
+    // find a sibling that already has sub-folders, to mirror its structure
+    var siblings = childrenOf(curFolderId());
+    var template = doCopy ? siblings.filter(function(s){ return childrenOf(s.id).length>0; })[0] : null;
+    var created = await MockAPI.createFolder({ exam_id:ADMIN.examId, parent_id:curFolderId(), name:name, order_index:siblings.length });
+    var cloned = 0;
+    if(template && created){ cloned = await cloneSubtree(template.id, created.id); }
     document.getElementById('folder-name').value='';
     ADMIN.folders = await MockAPI.listFolders(ADMIN.examId);
-    toast('✅ Folder added'); renderFolders(); }
-  catch(e){ toast('Failed: '+(e.message||e)); }
+    toast(cloned ? ('✅ Added "'+name+'" + '+cloned+' sub-folders (copied from "'+template.name+'")') : ('✅ Folder "'+name+'" added'));
+    renderFolders();
+  } catch(e){ toast('Failed: '+(e.message||e)); }
+}
+/* Recursively copy a template folder's descendants under newParentId. Returns count created. */
+async function cloneSubtree(templateId, newParentId){
+  var kids = childrenOf(templateId);
+  var count = 0;
+  for(var i=0;i<kids.length;i++){
+    var created = await MockAPI.createFolder({ exam_id:ADMIN.examId, parent_id:newParentId, name:kids[i].name, order_index:i });
+    count++;
+    count += await cloneSubtree(kids[i].id, created.id);
+  }
+  return count;
 }
 async function renameFolder(id){ var f=folderById(id); if(!f)return; var name=prompt('Rename folder:', f.name); if(!name)return;
   try{ await MockAPI.renameFolder(id,name.trim()); ADMIN.folders=await MockAPI.listFolders(ADMIN.examId); toast('✅ Renamed'); renderFolders(); }catch(e){ toast('Failed: '+(e.message||e)); } }
