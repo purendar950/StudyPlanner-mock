@@ -270,23 +270,25 @@
       box.innerHTML = html; return;
     }
 
-    // Render a tab row for each level from root down the current path
+    // Render a tab row for EACH level. Auto-select the first tab of a level when
+    // the user hasn't chosen one, so all nested rows (Tier → Year → Format → …)
+    // appear at once — like Testbook.
     var levelParent = null;
+    var effective = [];
     for(var depth=0; ; depth++){
       var sibs = childrenOf(levelParent);
       if(!sibs.length) break;
-      var selectedId = path[depth] || null;
-      // auto-select first if none chosen at this level and there are tests deeper only via a child:
+      var selectedId = path[depth] || sibs[0].id;
       html += '<div class="tabs-row">'+ sibs.map(function(f){
         var active = selectedId===f.id ? ' active':'';
         return '<div class="ftab'+active+'" onclick="selectFolder('+depth+',\''+f.id+'\')">'+esc(f.name)+' ('+testsInSubtree(f.id)+')</div>';
       }).join('') +'</div>';
-      if(!selectedId) break;            // stop drilling until a tab is chosen
+      effective.push(selectedId);
       levelParent = selectedId;
     }
 
-    // tests directly in the current folder (last in path) or exam-root tests if no path
-    var currentFolder = path.length ? path[path.length-1] : null;
+    // tests in the deepest selected folder (or exam-root tests if no folders)
+    var currentFolder = effective.length ? effective[effective.length-1] : null;
     var list = tests.filter(function(t){ return (t.folder_id||null)===currentFolder; });
     html += testListHtml(list);
     box.innerHTML = html;
