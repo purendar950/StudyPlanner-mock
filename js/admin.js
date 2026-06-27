@@ -7,6 +7,20 @@ function escA(s){ return String(s==null?'':s).replace(/'/g,"\\'").replace(/"/g,'
 function toast(m){ var t=document.getElementById('toast'); if(!t)return; t.textContent=m; t.style.opacity='1'; clearTimeout(t._t); t._t=setTimeout(function(){t.style.opacity='0';},2800); }
 function slug(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40); }
 
+/* ── Screen navigation (Categories ▸ Exams ▸ Exam) ── */
+function showScreen(name){
+  ADMIN.screen = name;
+  ['categories','exams','exam'].forEach(function(s){ var el=document.getElementById('screen-'+s); if(el) el.style.display = (s===name)?'block':'none'; });
+  var back=document.getElementById('adm-back'); if(back) back.style.display = (name==='categories')?'none':'block';
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+function setTitle(t){ var el=document.getElementById('adm-title'); if(el) el.textContent=t; }
+function catName(){ var c=ADMIN.cats.find(function(x){return x.id===ADMIN.catId;}); return c?c.name:'Exams'; }
+function admBack(){
+  if(ADMIN.screen==='exam'){ showScreen('exams'); setTitle(catName()); }
+  else if(ADMIN.screen==='exams'){ ADMIN.catId=null; showScreen('categories'); setTitle('Exam Categories'); }
+}
+
 /* ── Auth gate ── */
 async function adminBoot(){
   if(!(window.MockAPI && MockAPI.client())){
@@ -31,6 +45,7 @@ async function adminShow(){
     }
     login.style.display='none'; panel.style.display='block';
     document.getElementById('who').textContent = ADMIN.user.email || '';
+    showScreen('categories'); setTitle('Exam Categories');
     adminLoadCategories();
   } else { login.style.display='flex'; panel.style.display='none'; }
 }
@@ -86,16 +101,14 @@ async function saveCategory(){
 async function deleteCategory(id){ if(!confirm('Delete category "'+id+'" and all its exams/folders?'))return;
   try{ await MockAPI.deleteCategory(id); if(ADMIN.catId===id){ADMIN.catId=null;ADMIN.examId=null;} toast('🗑 Deleted'); adminLoadCategories(); resetExamArea(); }catch(e){ toast('Failed: '+(e.message||e)); } }
 
-function selectCategory(id){ ADMIN.catId=id; ADMIN.examId=null; renderCategories(); loadExams(); resetFolderArea(); }
+function selectCategory(id){ ADMIN.catId=id; ADMIN.examId=null; renderCategories(); clearExamForm(); setTitle(catName()); showScreen('exams'); loadExams(); }
 
 /* ── ② Exams ── */
 async function loadExams(){
-  var cat=ADMIN.cats.find(function(x){return x.id===ADMIN.catId;});
-  document.getElementById('exam-crumb').innerHTML = cat ? 'Category: <b>'+esc(cat.name)+'</b>' : '';
   try { ADMIN.exams = await MockAPI.listExams(ADMIN.catId, { publishedOnly:false }); } catch(e){ ADMIN.exams=[]; toast('Load failed: '+(e.message||e)); }
   renderExams();
 }
-function resetExamArea(){ document.getElementById('exam-list').innerHTML='<div class="empty">Select a category above.</div>'; document.getElementById('exam-crumb').innerHTML=''; resetFolderArea(); }
+function resetExamArea(){ var el=document.getElementById('exam-list'); if(el) el.innerHTML='<div class="empty">—</div>'; resetFolderArea(); }
 function renderExams(){
   var box=document.getElementById('exam-list');
   if(!ADMIN.catId){ box.innerHTML='<div class="empty">Select a category above.</div>'; return; }
@@ -127,21 +140,14 @@ async function saveExam(){
 async function deleteExam(id){ if(!confirm('Delete exam "'+id+'" and all its folders/tests?'))return;
   try{ await MockAPI.deleteExam(id); if(ADMIN.examId===id) ADMIN.examId=null; toast('🗑 Deleted'); loadExams(); resetFolderArea(); }catch(e){ toast('Failed: '+(e.message||e)); } }
 
-function selectExam(id){ ADMIN.examId=id; renderExams(); loadFolders(); adminRefreshTests(); }
+function selectExam(id){ ADMIN.examId=id; renderExams(); var e=ADMIN.exams.find(function(x){return x.id===id;}); setTitle(e?e.name:'Exam'); showScreen('exam'); loadFolders(); adminRefreshTests(); }
 
 /* ── ③ Folders ── */
 function resetFolderArea(){
-  document.getElementById('folder-tree').innerHTML='<div class="empty">Select an exam above.</div>';
-  document.getElementById('folder-crumb').innerHTML='';
-  document.getElementById('addtest-crumb').innerHTML='';
-  document.getElementById('folder-parent').innerHTML=''; document.getElementById('test-folder').innerHTML='';
-  document.getElementById('mock-tests-list').innerHTML='<div class="empty">Select an exam above.</div>';
+  var ids=['folder-tree','folder-parent','test-folder','mock-tests-list'];
+  ids.forEach(function(i){ var el=document.getElementById(i); if(el) el.innerHTML=''; });
 }
 async function loadFolders(){
-  var ex=ADMIN.exams.find(function(x){return x.id===ADMIN.examId;});
-  var crumb = ex ? 'Exam: <b>'+esc(ex.name)+'</b>' : '';
-  document.getElementById('folder-crumb').innerHTML=crumb;
-  document.getElementById('addtest-crumb').innerHTML=crumb;
   try { ADMIN.folders = await MockAPI.listFolders(ADMIN.examId); } catch(e){ ADMIN.folders=[]; toast('Load failed: '+(e.message||e)); }
   renderFolderTree(); populateFolderSelects();
 }
