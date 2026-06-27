@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="css/style.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase-config.js?v=12"></script>
+<script src="js/supabase-config.js?v=13"></script>
 <style>
   .container { max-width: 1000px; padding-top: 1.2rem; padding-bottom: 4rem; }
   .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.2rem; margin-bottom:1.2rem; }
@@ -156,6 +156,7 @@
       <div class="hint">Adds into: <b id="addtest-loc">(exam root)</b> · set Free/Paid, then upload the question JSON.</div>
       <div class="row"><label class="lbl" style="margin:0 8px 0 0;">Access</label>
         <select id="test-free"><option value="free">FREE</option><option value="paid">PAID</option></select></div>
+      <label class="muted" style="display:block;margin-top:8px;"><input type="checkbox" id="make-sectionals"> Also create subject-wise sectional tests (split each section into its own test under "Sectionals")</label>
       <div class="row" style="margin-top:10px;">
         <input type="file" id="mock-file" accept="application/json,.json" onchange="adminParseFile(this)">
         <button class="btn" onclick="adminTogglePaste()">📋 Paste JSON instead</button>
@@ -173,6 +174,7 @@
         <label class="btn btn-sm" style="cursor:pointer;">🗂 Select files
           <input type="file" id="bulk-files" accept="application/json,.json" multiple style="display:none;" onchange="bulkImport(this)"></label>
         <label class="muted"><input type="checkbox" id="bulk-free" checked> Mark all FREE</label>
+        <label class="muted"><input type="checkbox" id="bulk-sectionals"> + subject-wise sectionals</label>
       </div>
       <div id="bulk-report" style="margin-top:12px;"></div>
     </div>
@@ -205,6 +207,6 @@
   }
   if (!localStorage.getItem('mmh_theme')) document.documentElement.setAttribute('data-theme', 'dark');
 </script>
-<script src="js/admin.js?v=12"></script>
+<script src="js/admin.js?v=13"></script>
 </body>
 </html>

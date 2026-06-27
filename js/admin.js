@@ -349,12 +349,64 @@ async function adminUpload(){
     p.test.folder_id=curFolderId();
     p.test.is_free=document.getElementById('test-free').value!=='paid';
     var r=await MockAPI.uploadTest(p);
-    toast('✅ Uploaded '+r.questionCount+' questions.');
+    var extra='';
+    if(document.getElementById('make-sectionals') && document.getElementById('make-sectionals').checked){
+      try{ var n=await createSubjectSectionals(p, p.test.is_free); extra=' + '+n+' sectionals'; }catch(se){ extra=' (sectionals failed: '+(se.message||se)+')'; }
+    }
+    toast('✅ Uploaded '+r.questionCount+' questions'+extra+'.');
     ADMIN.parsed=null; var prev=document.getElementById('mock-preview'); if(prev) prev.innerHTML='<div class="muted">✅ Done.</div>';
     var ta=document.getElementById('mock-json-text'); if(ta) ta.value=''; var fi=document.getElementById('mock-file'); if(fi) fi.value='';
-    adminRefreshTests();
+    renderFolders(); adminRefreshTests();
   }catch(e){ toast('Upload failed: '+(e.message||e)); }
   finally{ ADMIN.busy=false; }
+}
+
+/* ── Create subject-wise sectional tests from a full mock (Option A) ──
+   For each section, make a single-section test under the sibling "Sectionals"
+   folder → subject sub-folder (auto-created, with name mapping). */
+var SUBJECT_MAP = {
+  'reasoning':'Reasoning','general intelligence':'Reasoning','general intelligence & reasoning':'Reasoning','gi':'Reasoning','gir':'Reasoning',
+  'gk':'General Awareness','ga':'General Awareness','general awareness':'General Awareness','general knowledge':'General Awareness','general knowledge & awareness':'General Awareness','gs':'General Awareness',
+  'math':'Maths','maths':'Maths','mathematics':'Maths','quant':'Maths','quantitative aptitude':'Maths','elementary mathematics':'Maths','numerical ability':'Maths',
+  'english':'English','english language':'English','english comprehension':'English',
+  'hindi':'Hindi'
+};
+function titleCase(s){ return String(s||'').toLowerCase().replace(/\b\w/g,function(c){return c.toUpperCase();}); }
+
+async function createSubjectSectionals(res, freeFlag){
+  var folders = await MockAPI.listFolders(ADMIN.examId);
+  var local = folders.slice();
+  function child(parentId,name){ return local.find(function(f){ return (f.parent_id||null)===(parentId||null) && f.name.toLowerCase()===String(name).toLowerCase(); }); }
+  async function ensure(parentId,name){ var ex=child(parentId,name); if(ex) return ex;
+    var c=await MockAPI.createFolder({ exam_id:ADMIN.examId, parent_id:parentId, name:name, order_index:0 }); local.push(c); return c; }
+
+  var curId=curFolderId();
+  var curFolder=local.find(function(f){return f.id===curId;});
+  var siblingParent = curFolder ? (curFolder.parent_id||null) : null;   // put "Sectionals" next to the full-mock folder
+  var sectionalsRoot = await ensure(siblingParent, 'Sectionals');
+
+  var made=0;
+  for(var i=0;i<res.sections.length;i++){
+    var sec=res.sections[i];
+    if(!sec.questions || !sec.questions.length) continue;
+    var disp = SUBJECT_MAP[String(sec.name).toLowerCase().trim()] || titleCase(sec.name);
+    var subj = await ensure(sectionalsRoot.id, disp);
+    var t = {
+      id: (res.test.id||'mock') + '-' + slug(sec.name || ('sec'+(i+1))),
+      title: res.test.title + ' – ' + disp,
+      exam_id: ADMIN.examId,
+      folder_id: subj.id,
+      correct_score: res.test.correct_score,
+      negative_score: res.test.negative_score,
+      section_time_min: sec.time_min || res.test.section_time_min || 15,
+      is_free: freeFlag,
+      is_published: true
+    };
+    await MockAPI.uploadTest({ test:t, sections:[ { name: sec.name, time_min: sec.time_min, questions: sec.questions } ] });
+    made++;
+  }
+  ADMIN.folders = await MockAPI.listFolders(ADMIN.examId);
+  return made;
 }
 
 /* ── Bulk import: upload many JSON mocks into the CURRENT folder (no sub-folders created), with per-file report ── */
@@ -365,9 +417,10 @@ async function bulkImport(input){
   if(!files.length){ if(report) report.innerHTML='<div class="empty">No .json files found in the selection.</div>'; return; }
   if(report) report.innerHTML='<div class="muted">⏳ Processing '+files.length+' file(s)…</div>';
   var markFree = !document.getElementById('bulk-free') || document.getElementById('bulk-free').checked;
+  var makeSec = document.getElementById('bulk-sectionals') && document.getElementById('bulk-sectionals').checked;
   var folderId = curFolderId();   // everything goes into the folder you're currently in
 
-  var ok=[], fail=[];
+  var ok=[], fail=[], secCount=0;
   for(var i=0;i<files.length;i++){
     var f=files[i];
     try{
@@ -379,15 +432,16 @@ async function bulkImport(input){
       if(!hasId) res.test.id = slug(f.name.replace(/\.json$/i,'')) || res.test.id;
       res.test.exam_id=ADMIN.examId; res.test.folder_id=folderId; res.test.is_free=markFree;
       await MockAPI.uploadTest(res);
+      if(makeSec){ try{ secCount += await createSubjectSectionals(res, markFree); }catch(se){} }
       var q=res.sections.reduce(function(a,s){return a+s.questions.length;},0);
       ok.push({ name:f.name, title:res.test.title, q:q });
     }catch(e){ fail.push({ name:f.name, err:(e.message||String(e)) }); }
   }
 
-  try { ADMIN.allTests=await MockAPI.listAllTests(ADMIN.examId); }catch(e){}
-  renderTestsHere();
+  try { ADMIN.folders=await MockAPI.listFolders(ADMIN.examId); ADMIN.allTests=await MockAPI.listAllTests(ADMIN.examId); }catch(e){}
+  renderFolders();
 
-  var html='<div style="font-weight:700;margin-bottom:8px;">Imported '+ok.length+' / '+files.length+(fail.length?(' · <span style="color:var(--red);">'+fail.length+' failed</span>'):'')+'</div>';
+  var html='<div style="font-weight:700;margin-bottom:8px;">Imported '+ok.length+' / '+files.length+(secCount?(' · '+secCount+' sectionals'):'')+(fail.length?(' · <span style="color:var(--red);">'+fail.length+' failed</span>'):'')+'</div>';
   if(ok.length) html += ok.map(function(o){ return '<div class="muted">✅ '+esc(o.name)+' → <b>'+esc(o.title)+'</b> ('+o.q+' Qs)</div>'; }).join('');
   if(fail.length) html += '<div style="color:var(--red);font-weight:700;margin-top:10px;">Errors — fix these and re-import:</div>'+
     fail.map(function(fl){ return '<div style="color:var(--red);">❌ '+esc(fl.name)+' — '+esc(fl.err)+'</div>'; }).join('');
