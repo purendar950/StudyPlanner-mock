@@ -1,87 +1,91 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-<script>
-  (function(){ var t = localStorage.getItem('mmh_theme'); if(t) document.documentElement.setAttribute('data-theme', t); })();
-</script>
+<script>(function(){ var t=localStorage.getItem('mmh_theme'); if(t) document.documentElement.setAttribute('data-theme',t); })();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<title>StudyPlanner Mock — Mock Tests for SSC, Railway, Banking & UPSC</title>
-<meta name="description" content="StudyPlanner Mock — free & premium mock tests for competitive exams: SSC CGL, CHSL, MTS, GD, RRB NTPC, IBPS PO, UPSC and more.">
+<title>StudyPlanner Mock — Mock Tests for Competitive Exams</title>
+<meta name="description" content="StudyPlanner Mock — mock tests for SSC, Railway, Banking & UPSC. Real exam interface, sectional timers, solutions and analysis.">
 <link rel="stylesheet" href="css/style.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-config.js"></script>
 <style>
-  .container { max-width: 1080px; }
-  .mock-hero { padding: 3rem 1.25rem 1.5rem; text-align:center;
-    background:radial-gradient(700px 380px at 50% 20%, rgba(0,200,150,0.10), transparent); }
-  .mock-hero h1 { font-size:clamp(1.9rem,5vw,3rem); font-weight:800; letter-spacing:-0.03em; margin-bottom:0.6rem; }
-  .mock-hero h1 .z { color:var(--accent); }
-  .mock-hero p { color:var(--muted); max-width:520px; margin:0 auto; font-size:1.02rem; }
-
+  .container { max-width: 1000px; }
   .acct { display:flex; align-items:center; gap:10px; }
-  .acct .hi { font-size:0.82rem; color:var(--muted); max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .acct .hi { font-size:0.82rem; color:var(--muted); max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
-  .toolbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:1.5rem 0 0.5rem; }
-  .search { flex:1; min-width:220px; background:var(--card); border:1px solid var(--border); color:var(--text);
-    border-radius:12px; padding:11px 14px; font-family:var(--font); font-size:0.92rem; }
+  /* hero (logged-out) */
+  .hero2 { padding:3.2rem 1.25rem 2rem; text-align:center; background:radial-gradient(700px 380px at 50% 20%, rgba(0,200,150,0.10), transparent); }
+  .hero2 h1 { font-size:clamp(1.9rem,5vw,3rem); font-weight:800; letter-spacing:-0.03em; margin-bottom:0.6rem; }
+  .hero2 h1 .z { color:var(--accent); }
+  .hero2 p { color:var(--muted); max-width:520px; margin:0 auto 1.4rem; font-size:1.02rem; }
+
+  /* app */
+  .appbar { display:flex; align-items:center; gap:12px; padding:0.9rem 0; }
+  .appbar .back { background:var(--card); border:1px solid var(--border); color:var(--text); width:38px; height:38px; border-radius:10px; font-size:1.1rem; cursor:pointer; }
+  .appbar h2 { font-size:1.25rem; }
+
+  .search { width:100%; background:var(--card); border:1px solid var(--border); color:var(--text); border-radius:12px; padding:11px 14px; font-family:var(--font); font-size:0.92rem; margin-bottom:1rem; }
   .search:focus { outline:none; border-color:var(--accent); }
 
-  .chips { display:flex; gap:8px; flex-wrap:wrap; margin:0.75rem 0 1.5rem; }
-  .chip { background:var(--card); border:1px solid var(--border); color:var(--muted); border-radius:99px;
-    padding:7px 15px; font-size:0.8rem; font-weight:700; cursor:pointer; transition:all .15s; }
-  .chip:hover { border-color:var(--accent); color:var(--text); }
-  .chip.active { background:rgba(0,200,150,0.12); border-color:var(--accent); color:var(--accent); }
+  .rowcard { display:flex; align-items:center; gap:14px; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1rem 1.1rem; margin-bottom:0.8rem; cursor:pointer; transition:transform .12s,border-color .12s; }
+  .rowcard:hover { transform:translateY(-1px); border-color:var(--accent); }
+  .rowcard .ic { width:46px; height:46px; border-radius:11px; flex-shrink:0; object-fit:cover; background:var(--surface); display:flex; align-items:center; justify-content:center; font-size:1.4rem; border:1px solid var(--border); }
+  .rowcard .t { font-weight:700; font-size:1rem; }
+  .rowcard .s { color:var(--muted); font-size:0.8rem; margin-top:2px; }
+  .rowcard .chev { margin-left:auto; color:var(--muted); font-size:1.2rem; }
+  .soon { background:rgba(245,158,11,0.16); color:#F59E0B; border-radius:7px; padding:2px 8px; font-size:0.66rem; font-weight:700; margin-left:8px; }
 
-  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1rem; padding-bottom:3rem; }
-  .test-card { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:1.2rem;
-    display:flex; flex-direction:column; gap:0.6rem; transition:transform .15s,border-color .15s; }
-  .test-card:hover { transform:translateY(-2px); border-color:var(--accent); }
-  .tc-top { display:flex; justify-content:space-between; gap:8px; align-items:flex-start; }
-  .tc-title { font-weight:700; font-size:1rem; line-height:1.35; }
-  .tag { display:inline-block; background:rgba(0,200,150,0.12); color:var(--accent);
-    border-radius:8px; padding:3px 9px; font-size:0.68rem; font-weight:700; white-space:nowrap; }
-  .tc-meta { display:flex; gap:10px; flex-wrap:wrap; font-size:0.76rem; color:var(--muted); }
-  .tc-meta b { color:var(--text); font-weight:700; }
-  .tc-start { margin-top:0.4rem; background:var(--accent); color:#000; border:none; border-radius:10px;
-    padding:11px; font-weight:700; font-size:0.9rem; cursor:pointer; font-family:var(--font); transition:all .15s; }
-  .tc-start:hover { background:var(--accent-dark); }
+  .tabs-row { display:flex; gap:7px; overflow-x:auto; padding-bottom:8px; margin-bottom:6px; -webkit-overflow-scrolling:touch; }
+  .ftab { white-space:nowrap; background:var(--card); border:1px solid var(--border); color:var(--muted); border-radius:99px; padding:7px 14px; font-size:0.82rem; font-weight:700; cursor:pointer; }
+  .ftab.active { background:rgba(0,200,150,0.12); border-color:var(--accent); color:var(--accent); }
 
-  .state { text-align:center; color:var(--muted); padding:3rem 1rem; font-size:0.95rem; grid-column:1/-1; }
-  .state code { background:var(--surface); padding:2px 6px; border-radius:5px; font-size:0.85em; }
-  .skeleton { height:150px; border-radius:16px; background:linear-gradient(90deg,var(--card),var(--surface),var(--card));
-    background-size:200% 100%; animation:sk 1.2s infinite; }
+  .test { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1rem 1.1rem; margin-bottom:0.8rem; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+  .test .tt { font-weight:700; font-size:0.96rem; }
+  .test .mm { color:var(--muted); font-size:0.78rem; margin-top:4px; display:flex; gap:12px; flex-wrap:wrap; }
+  .b-free { background:rgba(0,200,150,0.16); color:var(--accent); border-radius:6px; padding:2px 8px; font-size:0.64rem; font-weight:800; }
+  .b-paid { background:rgba(245,158,11,0.18); color:#F59E0B; border-radius:6px; padding:2px 8px; font-size:0.64rem; font-weight:800; }
+  .test .acts { display:flex; flex-direction:column; gap:6px; flex-shrink:0; }
+  .btn-start { background:var(--accent); color:#000; border:none; border-radius:9px; padding:10px 18px; font-weight:700; font-size:0.84rem; cursor:pointer; font-family:var(--font); }
+  .btn-start:hover { background:var(--accent-dark); }
+  .btn-an { background:#6C5CE7; color:#fff; border:none; border-radius:9px; padding:9px 18px; font-weight:700; font-size:0.82rem; cursor:pointer; font-family:var(--font); }
+  .btn-re { background:transparent; color:var(--accent); border:1px solid var(--accent); border-radius:9px; padding:8px 18px; font-weight:700; font-size:0.8rem; cursor:pointer; font-family:var(--font); }
+
+  .state { text-align:center; color:var(--muted); padding:2.5rem 1rem; font-size:0.95rem; }
+  .skeleton { height:64px; border-radius:14px; margin-bottom:0.8rem; background:linear-gradient(90deg,var(--card),var(--surface),var(--card)); background-size:200% 100%; animation:sk 1.2s infinite; }
   @keyframes sk { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
 
-  /* Auth modal */
-  .ov { position:fixed; inset:0; z-index:1000; display:none; align-items:center; justify-content:center; padding:1rem;
-    background:rgba(5,8,12,0.72); backdrop-filter:blur(6px); }
+  /* bottom nav */
+  .bnav { position:sticky; bottom:0; display:flex; background:var(--card); border-top:1px solid var(--border); }
+  .bnav button { flex:1; background:none; border:none; color:var(--muted); padding:0.7rem 0; font-family:var(--font); font-size:0.72rem; font-weight:700; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .bnav button.active { color:var(--accent); }
+  .bnav .bi { font-size:1.15rem; }
+  body { padding-bottom:0; }
+
+  /* auth modal */
+  .ov { position:fixed; inset:0; z-index:1000; display:none; align-items:center; justify-content:center; padding:1rem; background:rgba(5,8,12,0.72); backdrop-filter:blur(6px); }
   .ov.open { display:flex; }
-  .modal { width:100%; max-width:380px; background:var(--card); border:1px solid var(--border);
-    border-radius:18px; padding:1.6rem 1.4rem; position:relative; }
-  .modal h2 { font-size:1.2rem; margin-bottom:0.3rem; }
-  .modal .sub { color:var(--muted); font-size:0.84rem; margin-bottom:1rem; }
+  .modal { width:100%; max-width:380px; background:var(--card); border:1px solid var(--border); border-radius:18px; padding:1.6rem 1.4rem; position:relative; }
+  .modal h2 { font-size:1.2rem; margin-bottom:0.3rem; } .modal .sub { color:var(--muted); font-size:0.84rem; margin-bottom:1rem; }
   .modal .x { position:absolute; top:12px; right:14px; background:none; border:none; color:var(--muted); font-size:1.4rem; cursor:pointer; }
   .tabs { display:flex; gap:6px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:4px; margin-bottom:1rem; }
   .tab { flex:1; text-align:center; padding:8px; border-radius:7px; font-size:0.85rem; font-weight:700; cursor:pointer; color:var(--muted); }
   .tab.active { background:var(--accent); color:#000; }
   .fld { display:flex; flex-direction:column; gap:5px; margin-bottom:0.8rem; }
   .fld label { font-size:0.78rem; color:var(--muted); }
-  .fld input { background:var(--surface); border:1px solid var(--border); color:var(--text);
-    border-radius:9px; padding:10px 12px; font-family:var(--font); font-size:0.9rem; }
+  .fld input { background:var(--surface); border:1px solid var(--border); color:var(--text); border-radius:9px; padding:10px 12px; font-family:var(--font); font-size:0.9rem; }
   .fld input:focus { outline:none; border-color:var(--accent); }
   .pane { display:none; } .pane.active { display:block; }
-  .msg { font-size:0.8rem; margin-top:6px; min-height:18px; }
-  .msg.err { color:var(--red); } .msg.ok { color:var(--accent); }
+  .msg { font-size:0.8rem; margin-top:6px; min-height:18px; } .msg.err { color:var(--red); } .msg.ok { color:var(--accent); }
+  .btn-w { width:100%; background:var(--accent); color:#000; border:none; border-radius:10px; padding:11px; font-weight:700; cursor:pointer; font-family:var(--font); }
 </style>
 </head>
 <body>
 
 <nav class="nav">
-  <div class="nav-inner" style="max-width:1080px;">
+  <div class="nav-inner" style="max-width:1000px;">
     <a class="logo" href="index.html">Study<span class="z">Planner</span>&nbsp;Mock</a>
     <div class="nav-cta">
       <button class="btn-theme" id="theme-btn" title="Toggle theme" onclick="toggleTheme()">🌙</button>
@@ -90,28 +94,29 @@
   </div>
 </nav>
 
-<header class="mock-hero">
+<!-- LOGGED-OUT HERO -->
+<header class="hero2" id="hero" style="display:none;">
   <div class="hero-badge">🎯 SSC · Railway · Banking · UPSC</div>
   <h1>Mock tests for <span class="z">competitive exams</span></h1>
-  <p>Attempt full mocks and sectional tests in a real exam interface — sectional timers, question palette, bilingual questions, instant solutions and analysis.</p>
+  <p>Sign in to access full mocks & sectional tests in a real exam interface — sectional timers, bilingual questions, instant solutions and analysis.</p>
+  <button class="btn btn-green btn-big" onclick="openAuth('signup')">🚀 Create free account</button>
+  <button class="btn btn-ghost btn-big" onclick="openAuth('login')">Sign In</button>
 </header>
 
-<main class="container">
-  <div class="toolbar">
-    <input class="search" id="search" type="search" placeholder="🔍 Search mock tests…" oninput="renderTests()">
+<!-- APP (logged in) -->
+<main class="container" id="app" style="display:none;">
+  <div class="appbar">
+    <button class="back" id="backBtn" onclick="goBack()" style="display:none;">←</button>
+    <h2 id="viewTitle">Exams</h2>
   </div>
-  <div class="chips" id="chips"></div>
-  <div class="grid" id="grid">
-    <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
-  </div>
+  <div id="content"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
 </main>
 
-<footer>
-  <div class="container foot" style="max-width:1080px;">
-    <a class="logo" href="index.html" style="font-size:0.95rem;">Study<span class="z">Planner</span>&nbsp;Mock</a>
-    <div>© 2026 StudyPlanner Mock · Mock tests for competitive exams.</div>
-  </div>
-</footer>
+<!-- BOTTOM NAV -->
+<nav class="bnav" id="bnav" style="display:none;">
+  <button id="nav-exams" class="active" onclick="navTo('exams')"><span class="bi">📚</span>Exams</button>
+  <button id="nav-profile" onclick="navTo('profile')"><span class="bi">👤</span>Profile</button>
+</nav>
 
 <!-- AUTH MODAL -->
 <div class="ov" id="auth-ov" onclick="if(event.target===this)closeAuth()">
@@ -123,181 +128,225 @@
       <div class="tab active" id="t-login" onclick="authTab('login')">Sign In</div>
       <div class="tab" id="t-signup" onclick="authTab('signup')">Sign Up</div>
     </div>
-
     <div class="pane active" id="p-login">
       <div class="fld"><label>Email</label><input type="email" id="li-email" placeholder="you@example.com"></div>
       <div class="fld"><label>Password</label><input type="password" id="li-pass" placeholder="••••••••"></div>
-      <button class="tc-start" style="width:100%;" onclick="doLogin()">Sign In</button>
+      <button class="btn-w" onclick="doLogin()">Sign In</button>
       <div class="msg" id="li-msg"></div>
     </div>
-
     <div class="pane" id="p-signup">
       <div class="fld"><label>Full name</label><input type="text" id="su-name" placeholder="Your name"></div>
       <div class="fld"><label>Email</label><input type="email" id="su-email" placeholder="you@example.com"></div>
       <div class="fld"><label>Password</label><input type="password" id="su-pass" placeholder="Min. 6 characters"></div>
-      <button class="tc-start" style="width:100%;" onclick="doSignup()">Create Account</button>
+      <button class="btn-w" onclick="doSignup()">Create Account</button>
       <div class="msg" id="su-msg"></div>
     </div>
   </div>
 </div>
 
 <script>
-  function toggleTheme() {
-    var dark = document.documentElement.getAttribute('data-theme') !== 'light';
-    var next = dark ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('mmh_theme', next);
-    applyThemeBtn();
-  }
-  function applyThemeBtn(){ var b=document.getElementById('theme-btn'); if(b) b.textContent = document.documentElement.getAttribute('data-theme')==='light'?'☀️':'🌙'; }
-  if (!localStorage.getItem('mmh_theme')) document.documentElement.setAttribute('data-theme', 'dark');
-  applyThemeBtn();
-
+  function toggleTheme(){ var d=document.documentElement.getAttribute('data-theme')!=='light'; var n=d?'light':'dark'; document.documentElement.setAttribute('data-theme',n); localStorage.setItem('mmh_theme',n); tb(); }
+  function tb(){ var b=document.getElementById('theme-btn'); if(b) b.textContent=document.documentElement.getAttribute('data-theme')==='light'?'☀️':'🌙'; }
+  if(!localStorage.getItem('mmh_theme')) document.documentElement.setAttribute('data-theme','dark'); tb();
   function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   var SB = window._supabase || null;
-  var CURRENT_USER = null;
-  var pendingTestId = null;
+  var CURRENT_USER = null, ATTEMPTED = {}, pendingTestId = null;
 
-  /* ── Account / session ── */
-  async function refreshSession() {
-    if (!SB) return;
-    try { var r = await SB.auth.getUser(); CURRENT_USER = (r && r.data) ? r.data.user : null; }
-    catch(e){ CURRENT_USER = null; }
-    renderAcct();
-    syncIdentity();
-  }
-  function userName(u){ return (u && u.user_metadata && u.user_metadata.full_name) || (u && u.email) || 'Student'; }
-  function syncIdentity(){
-    try {
-      if (CURRENT_USER) {
-        localStorage.setItem('ez_user_uid', CURRENT_USER.id);
-        localStorage.setItem('ez_user_name', userName(CURRENT_USER));
-      } else {
-        localStorage.removeItem('ez_user_uid');
-        localStorage.removeItem('ez_user_name');
-      }
-    } catch(e){}
-  }
-  function renderAcct() {
-    var box = document.getElementById('acct');
-    if (!box) return;
-    if (!SB) { box.innerHTML = ''; return; }
-    if (CURRENT_USER) {
-      box.innerHTML = '<span class="hi">Hi, ' + esc(userName(CURRENT_USER)) + '</span>' +
-        '<button class="btn btn-ghost" onclick="doLogout()">Log out</button>';
-    } else {
-      box.innerHTML = '<button class="btn btn-green" onclick="openAuth(\'login\')">Sign In</button>';
-    }
+  /* ── Session ── */
+  function userName(u){ return (u&&u.user_metadata&&u.user_metadata.full_name)||(u&&u.email)||'Student'; }
+  function syncIdentity(){ try{ if(CURRENT_USER){ localStorage.setItem('ez_user_uid',CURRENT_USER.id); localStorage.setItem('ez_user_name',userName(CURRENT_USER)); } else { localStorage.removeItem('ez_user_uid'); localStorage.removeItem('ez_user_name'); } }catch(e){} }
+  async function refreshSession(){ if(!SB) return; try{ var r=await SB.auth.getUser(); CURRENT_USER=(r&&r.data)?r.data.user:null; }catch(e){ CURRENT_USER=null; } syncIdentity(); renderAcct(); renderShell(); }
+  function renderAcct(){ var b=document.getElementById('acct'); if(!b) return;
+    if(!SB){ b.innerHTML=''; return; }
+    b.innerHTML = CURRENT_USER ? '<span class="hi">Hi, '+esc(userName(CURRENT_USER))+'</span><button class="btn btn-ghost" onclick="doLogout()">Log out</button>'
+      : '<button class="btn btn-green" onclick="openAuth(\'login\')">Sign In</button>'; }
+
+  function renderShell(){
+    var loggedIn = !!CURRENT_USER;
+    document.getElementById('hero').style.display = loggedIn ? 'none' : 'block';
+    document.getElementById('app').style.display  = loggedIn ? 'block' : 'none';
+    document.getElementById('bnav').style.display  = loggedIn ? 'flex' : 'none';
+    if(loggedIn){ loadAttempts().then(function(){ navTo('exams'); }); }
   }
 
   /* ── Auth modal ── */
-  function openAuth(tab){ authTab(tab||'login'); document.getElementById('auth-ov').classList.add('open'); }
+  function openAuth(t){ authTab(t||'login'); document.getElementById('auth-ov').classList.add('open'); }
   function closeAuth(){ document.getElementById('auth-ov').classList.remove('open'); }
-  function authTab(which){
-    document.getElementById('t-login').classList.toggle('active', which==='login');
-    document.getElementById('t-signup').classList.toggle('active', which==='signup');
-    document.getElementById('p-login').classList.toggle('active', which==='login');
-    document.getElementById('p-signup').classList.toggle('active', which==='signup');
-  }
-
-  async function doLogin(){
-    var m = document.getElementById('li-msg'); m.className='msg'; m.textContent='Signing in…';
-    var email=(document.getElementById('li-email').value||'').trim();
-    var pass=document.getElementById('li-pass').value||'';
+  function authTab(w){ document.getElementById('t-login').classList.toggle('active',w==='login'); document.getElementById('t-signup').classList.toggle('active',w==='signup');
+    document.getElementById('p-login').classList.toggle('active',w==='login'); document.getElementById('p-signup').classList.toggle('active',w==='signup'); }
+  async function doLogin(){ var m=document.getElementById('li-msg'); m.className='msg'; m.textContent='Signing in…';
+    var email=(document.getElementById('li-email').value||'').trim(), pass=document.getElementById('li-pass').value||'';
     if(!email||!pass){ m.className='msg err'; m.textContent='Enter email and password.'; return; }
-    try {
-      var r = await SB.auth.signInWithPassword({ email:email, password:pass });
-      if (r.error) throw r.error;
-      CURRENT_USER = r.data.user; syncIdentity(); renderAcct();
-      m.className='msg ok'; m.textContent='Welcome!';
-      closeAuth();
-      if (pendingTestId){ var id=pendingTestId; pendingTestId=null; startTest(id); }
-    } catch(e){ m.className='msg err'; m.textContent = e.message || 'Login failed.'; }
-  }
-
-  async function doSignup(){
-    var m = document.getElementById('su-msg'); m.className='msg'; m.textContent='Creating account…';
-    var name=(document.getElementById('su-name').value||'').trim();
-    var email=(document.getElementById('su-email').value||'').trim();
-    var pass=document.getElementById('su-pass').value||'';
+    try{ var r=await SB.auth.signInWithPassword({email:email,password:pass}); if(r.error) throw r.error;
+      CURRENT_USER=r.data.user; syncIdentity(); renderAcct(); closeAuth(); await loadAttempts(); navTo('exams');
+      if(pendingTestId){ var id=pendingTestId; pendingTestId=null; startTest(id); } }
+    catch(e){ m.className='msg err'; m.textContent=e.message||'Login failed.'; } }
+  async function doSignup(){ var m=document.getElementById('su-msg'); m.className='msg'; m.textContent='Creating account…';
+    var name=(document.getElementById('su-name').value||'').trim(), email=(document.getElementById('su-email').value||'').trim(), pass=document.getElementById('su-pass').value||'';
     if(!name||!email||!pass){ m.className='msg err'; m.textContent='Fill all fields.'; return; }
     if(pass.length<6){ m.className='msg err'; m.textContent='Password must be at least 6 characters.'; return; }
+    try{ var r=await SB.auth.signUp({email:email,password:pass,options:{data:{full_name:name}}}); if(r.error) throw r.error;
+      if(r.data.session){ CURRENT_USER=r.data.user; syncIdentity(); renderAcct(); closeAuth(); await loadAttempts(); navTo('exams'); if(pendingTestId){ var id=pendingTestId; pendingTestId=null; startTest(id);} }
+      else { m.className='msg ok'; m.textContent='Account created! Check your email to confirm, then sign in.'; authTab('login'); } }
+    catch(e){ m.className='msg err'; m.textContent=e.message||'Sign up failed.'; } }
+  async function doLogout(){ try{ await SB.auth.signOut(); }catch(e){} CURRENT_USER=null; syncIdentity(); renderAcct(); renderShell(); }
+
+  /* ── Attempts (for Start vs Analysis/Reattempt + Profile) ── */
+  async function loadAttempts(){ ATTEMPTED={};
+    if(!(window.MockAPI && MockAPI.configured && CURRENT_USER)) return;
+    try{ var rows=await MockAPI.getUserAttempts(CURRENT_USER.id); rows.forEach(function(a){ if(!ATTEMPTED[a.test_id]) ATTEMPTED[a.test_id]=a; }); }catch(e){}
+  }
+
+  /* ── Navigation ── */
+  var NAV = []; // stack of {view, ...}
+  function navTo(view){ // bottom-nav roots
+    document.getElementById('nav-exams').classList.toggle('active', view==='exams');
+    document.getElementById('nav-profile').classList.toggle('active', view==='profile');
+    NAV = [{ view: view }];
+    render();
+  }
+  function push(state){ NAV.push(state); render(); }
+  function goBack(){ if(NAV.length>1){ NAV.pop(); render(); } }
+  function cur(){ return NAV[NAV.length-1]; }
+
+  function setBar(title, showBack){ document.getElementById('viewTitle').textContent=title; document.getElementById('backBtn').style.display=showBack?'block':'none'; }
+
+  async function render(){
+    var s = cur(); var box=document.getElementById('content');
+    if(!(window.MockAPI && MockAPI.configured)){ box.innerHTML='<div class="state">⚠️ Not connected to Supabase yet.</div>'; return; }
+    box.innerHTML='<div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>';
     try {
-      var r = await SB.auth.signUp({ email:email, password:pass, options:{ data:{ full_name:name } } });
-      if (r.error) throw r.error;
-      if (r.data.session) {
-        CURRENT_USER = r.data.user; syncIdentity(); renderAcct();
-        m.className='msg ok'; m.textContent='Account created!';
-        closeAuth();
-        if (pendingTestId){ var id=pendingTestId; pendingTestId=null; startTest(id); }
-      } else {
-        m.className='msg ok';
-        m.textContent='Account created! Please check your email to confirm, then sign in.';
-        authTab('login');
-      }
-    } catch(e){ m.className='msg err'; m.textContent = e.message || 'Sign up failed.'; }
+      if(s.view==='exams'){ await renderCategories(box); }
+      else if(s.view==='category'){ await renderExams(box, s.cat); }
+      else if(s.view==='exam'){ await renderExam(box, s.exam); }
+      else if(s.view==='profile'){ await renderProfile(box); }
+    } catch(e){ box.innerHTML='<div class="state">Error: '+esc(e.message||String(e))+'</div>'; }
   }
 
-  async function doLogout(){ try{ await SB.auth.signOut(); }catch(e){} CURRENT_USER=null; syncIdentity(); renderAcct(); }
-
-  /* ── Tests ── */
-  var EXAM_LABELS = { cgl:'SSC CGL', chsl:'SSC CHSL', mts:'SSC MTS', cpo:'SSC CPO', steno:'SSC Steno',
-    gd:'SSC GD', ntpc:'RRB NTPC', 'group-d':'RRB Group D', rrb:'RRB', ibps:'IBPS PO', sbi:'SBI PO',
-    bank:'Banking', upsc:'UPSC CSE', uppcs:'UPPCS', bpsc:'BPSC' };
-  function examLabel(e){ if(!e) return 'General'; return EXAM_LABELS[String(e).toLowerCase()] || String(e).toUpperCase(); }
-
-  var ALL_TESTS = [], ACTIVE_EXAM = 'all';
-
-  async function loadTests() {
-    var grid = document.getElementById('grid');
-    if (!(window.MockAPI && MockAPI.configured)) {
-      grid.innerHTML = '<div class="state">⚠️ Mock tests are not connected yet. Set your keys in <code>js/supabase-config.js</code>.</div>';
-      return;
-    }
-    try { ALL_TESTS = await MockAPI.listTests({ publishedOnly: true }); }
-    catch (e) { grid.innerHTML = '<div class="state">Could not load tests: ' + esc(e.message || String(e)) + '</div>'; return; }
-    renderChips(); renderTests();
-  }
-  function renderChips() {
-    var exams = {};
-    ALL_TESTS.forEach(function(t){ var k=(t.exam||'').toLowerCase(); if(k) exams[k]=(exams[k]||0)+1; });
-    var keys = Object.keys(exams).sort();
-    var html = '<div class="chip ' + (ACTIVE_EXAM==='all'?'active':'') + '" onclick="setExam(\'all\')">All (' + ALL_TESTS.length + ')</div>';
-    keys.forEach(function(k){ html += '<div class="chip ' + (ACTIVE_EXAM===k?'active':'') + '" onclick="setExam(\'' + k + '\')">' + esc(examLabel(k)) + ' (' + exams[k] + ')</div>'; });
-    document.getElementById('chips').innerHTML = keys.length ? html : '';
-  }
-  function setExam(e){ ACTIVE_EXAM=e; renderChips(); renderTests(); }
-  function renderTests() {
-    var grid = document.getElementById('grid');
-    var q = (document.getElementById('search').value || '').toLowerCase().trim();
-    var list = ALL_TESTS.filter(function(t){
-      if (ACTIVE_EXAM!=='all' && (t.exam||'').toLowerCase()!==ACTIVE_EXAM) return false;
-      if (q && !((t.title||'')+' '+(t.exam||'')+' '+(t.id||'')).toLowerCase().includes(q)) return false;
-      return true;
-    });
-    if (!list.length) { grid.innerHTML = '<div class="state">No mock tests found' + (q?' for "'+esc(q)+'"':'') + '.</div>'; return; }
-    grid.innerHTML = list.map(function(t){
-      return '<div class="test-card">' +
-        '<div class="tc-top"><div class="tc-title">' + esc(t.title || t.id) + '</div>' +
-          '<span class="tag">' + esc(examLabel(t.exam)) + (t.tier?' · '+esc(String(t.tier).toUpperCase()):'') + '</span></div>' +
-        '<div class="tc-meta"><span><b>' + (t.total_questions||0) + '</b> Qs</span>' +
-          '<span><b>' + (t.total_sections||0) + '</b> sections</span>' +
-          '<span>+<b>' + t.correct_score + '</b> / -<b>' + t.negative_score + '</b></span></div>' +
-        '<button class="tc-start" onclick="startTest(\'' + String(t.id).replace(/'/g,"\\'") + '\')">▶ Start Test</button>' +
-      '</div>';
+  /* Categories */
+  async function renderCategories(box){
+    setBar('Exam Categories', false);
+    var cats = await MockAPI.listCategories({ publishedOnly:true });
+    if(!cats.length){ box.innerHTML='<div class="state">No exams published yet. Please check back soon.</div>'; return; }
+    box.innerHTML = cats.map(function(c){
+      var icon = c.icon_url ? '<img class="ic" src="'+esc(c.icon_url)+'">' : '<div class="ic">📚</div>';
+      var soon = c.is_coming_soon ? '<span class="soon">COMING SOON</span>' : '';
+      var click = c.is_coming_soon ? '' : 'onclick="push({view:\'category\',cat:'+JSON.stringify(c).replace(/"/g,'&quot;')+'})"';
+      return '<div class="rowcard" '+click+'>'+icon+'<div><div class="t">'+esc(c.name)+soon+'</div><div class="s">'+esc(c.subtitle||'')+'</div></div><span class="chev">›</span></div>';
     }).join('');
   }
 
-  /* Require login before taking a test */
-  function startTest(id) {
-    if (!CURRENT_USER) { pendingTestId = id; openAuth('login'); return; }
+  /* Exams in a category */
+  async function renderExams(box, cat){
+    setBar(cat.name, true);
+    var exams = await MockAPI.listExams(cat.id, { publishedOnly:true });
+    if(!exams.length){ box.innerHTML='<div class="state">No exams here yet.</div>'; return; }
+    box.innerHTML = exams.map(function(e){
+      var icon = e.icon_url ? '<img class="ic" src="'+esc(e.icon_url)+'">' : '<div class="ic">📄</div>';
+      return '<div class="rowcard" onclick="push({view:\'exam\',exam:'+JSON.stringify(e).replace(/"/g,'&quot;')+'})">'+icon+
+        '<div><div class="t">'+esc(e.name)+'</div><div class="s">'+esc(e.subtitle||'')+'</div></div><span class="chev">›</span></div>';
+    }).join('');
+  }
+
+  /* One exam: nested folder tabs + tests */
+  var EXAM_CACHE = {};
+  async function renderExam(box, exam){
+    setBar(exam.name, true);
+    var data = EXAM_CACHE[exam.id] || (EXAM_CACHE[exam.id] = await MockAPI.getExamTree(exam.id, { publishedOnly:true }));
+    var folders = data.folders, tests = data.tests;
+    var path = cur().path || []; // array of folder ids
+
+    function childrenOf(pid){ return folders.filter(function(f){ return (f.parent_id||null)===(pid||null); }); }
+    function descendants(id){ var out=[id]; childrenOf(id).forEach(function(c){ out=out.concat(descendants(c.id)); }); return out; }
+    function testsInSubtree(id){ var ids=descendants(id); return tests.filter(function(t){ return ids.indexOf(t.folder_id)>=0; }).length; }
+
+    var html = '<input class="search" id="exam-search" placeholder="🔍 Search by mock name…" value="'+esc(cur().q||'')+'" oninput="onExamSearch(this.value)">';
+
+    var q = (cur().q||'').toLowerCase().trim();
+    if(q){
+      var found = tests.filter(function(t){ return ((t.title||'')+' '+(t.id||'')).toLowerCase().indexOf(q)>=0; });
+      html += testListHtml(found);
+      box.innerHTML = html; return;
+    }
+
+    // Render a tab row for each level from root down the current path
+    var levelParent = null;
+    for(var depth=0; ; depth++){
+      var sibs = childrenOf(levelParent);
+      if(!sibs.length) break;
+      var selectedId = path[depth] || null;
+      // auto-select first if none chosen at this level and there are tests deeper only via a child:
+      html += '<div class="tabs-row">'+ sibs.map(function(f){
+        var active = selectedId===f.id ? ' active':'';
+        return '<div class="ftab'+active+'" onclick="selectFolder('+depth+',\''+f.id+'\')">'+esc(f.name)+' ('+testsInSubtree(f.id)+')</div>';
+      }).join('') +'</div>';
+      if(!selectedId) break;            // stop drilling until a tab is chosen
+      levelParent = selectedId;
+    }
+
+    // tests directly in the current folder (last in path) or exam-root tests if no path
+    var currentFolder = path.length ? path[path.length-1] : null;
+    var list = tests.filter(function(t){ return (t.folder_id||null)===currentFolder; });
+    html += testListHtml(list);
+    box.innerHTML = html;
+  }
+
+  function testListHtml(list){
+    if(!list.length) return '<div class="state">No tests here.</div>';
+    return list.map(function(t){
+      var mins = testMinutes(t);
+      var badge = t.is_free===false ? '<span class="b-paid">PAID</span>' : '<span class="b-free">FREE</span>';
+      var acts;
+      if(ATTEMPTED[t.id]){
+        acts = '<button class="btn-an" onclick="openTest(\''+escj(t.id)+'\',\'\')">Analysis</button>'+
+               '<button class="btn-re" onclick="openTest(\''+escj(t.id)+'\',\'reattempt\')">Reattempt</button>';
+      } else {
+        acts = '<button class="btn-start" onclick="openTest(\''+escj(t.id)+'\',\'\')">Start Test</button>';
+      }
+      return '<div class="test"><div><div class="tt">'+esc(t.title||t.id)+' '+badge+'</div>'+
+        '<div class="mm"><span>❓ '+(t.total_questions||0)+' Questions</span><span>⏱ '+mins+' Min</span>'+(t.language?'<span>🌐 '+esc(t.language)+'</span>':'')+'</div></div>'+
+        '<div class="acts">'+acts+'</div></div>';
+    }).join('');
+  }
+  function escj(s){ return String(s).replace(/'/g,"\\'"); }
+  function testMinutes(t){ try{ if(Array.isArray(t.sections_meta)&&t.sections_meta.length) return t.sections_meta.reduce(function(s,m){return s+(Number(m.time_min)||0);},0); }catch(e){} return (Number(t.section_time_min)||15)*(t.total_sections||1); }
+
+  function selectFolder(depth, id){
+    var s = cur(); var path = (s.path||[]).slice(0, depth); // truncate to this level
+    path[depth] = id; s.path = path; render();
+  }
+  function onExamSearch(v){ cur().q = v; render(); }
+
+  function openTest(id, mode){
+    if(!CURRENT_USER){ pendingTestId=id; openAuth('login'); return; }
     syncIdentity();
-    window.location.href = 'test-engine.html?id=' + encodeURIComponent(id);
+    window.location.href = 'test-engine.html?id='+encodeURIComponent(id)+(mode?'&mode='+mode:'');
+  }
+  function startTest(id){ openTest(id,''); }
+
+  /* Profile / My Attempts */
+  async function renderProfile(box){
+    setBar('My Profile', false);
+    var head = '<div class="rowcard" style="cursor:default;"><div class="ic">👤</div><div><div class="t">'+esc(userName(CURRENT_USER))+'</div><div class="s">'+esc(CURRENT_USER.email||'')+'</div></div></div>';
+    var rows=[];
+    try{ rows = await MockAPI.getUserAttempts(CURRENT_USER.id); }catch(e){}
+    var att = '<h3 style="margin:1rem 0 0.6rem;">📊 My Attempts ('+rows.length+')</h3>';
+    if(!rows.length){ att += '<div class="state">No attempts yet. Take a test from the Exams tab.</div>'; }
+    else {
+      att += rows.map(function(a){
+        var pct = (a.percentage!=null? a.percentage : (a.max_score? Math.round(a.score/a.max_score*100):0));
+        var when = a.submitted_at ? new Date(a.submitted_at).toLocaleString() : '';
+        return '<div class="test"><div><div class="tt">'+esc(a.test_id)+'</div>'+
+          '<div class="mm"><span>🧮 '+(a.score!=null?a.score:'-')+' / '+(a.max_score!=null?a.max_score:'-')+'</span><span>🎯 '+pct+'%</span><span>✅ '+(a.correct||0)+' · ❌ '+(a.wrong||0)+'</span><span>'+esc(when)+'</span></div></div>'+
+          '<div class="acts"><button class="btn-an" onclick="openTest(\''+escj(a.test_id)+'\',\'\')">Analysis</button><button class="btn-re" onclick="openTest(\''+escj(a.test_id)+'\',\'reattempt\')">Reattempt</button></div></div>';
+      }).join('');
+    }
+    box.innerHTML = head + att + '<div style="margin-top:1.2rem;"><button class="btn btn-ghost" onclick="doLogout()">Log out</button></div>';
   }
 
   // Boot
-  (async function(){ await refreshSession(); loadTests(); })();
+  (async function(){ await refreshSession(); })();
 </script>
 </body>
 </html>

@@ -11,16 +11,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase-config.js"></script>
 <style>
-  .container { max-width: 980px; padding-top: 1.5rem; padding-bottom: 3rem; }
+  .container { max-width: 1000px; padding-top: 1.5rem; padding-bottom: 4rem; }
   .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.2rem; margin-bottom:1.2rem; }
-  .card h3 { margin-bottom:0.6rem; font-size:1.05rem; }
+  .card h3 { margin-bottom:0.3rem; font-size:1.05rem; }
+  .card .hint { color:var(--muted); font-size:0.8rem; margin-bottom:0.8rem; }
   .muted { color:var(--muted); font-size:0.85rem; }
   .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-  input[type=text], input[type=email], input[type=password], input[type=file], textarea {
+  input[type=text], input[type=email], input[type=password], input[type=file], textarea, select {
     background:var(--surface); border:1px solid var(--border); color:var(--text);
     border-radius:9px; padding:10px 12px; font-family:var(--font); font-size:0.9rem; }
-  input:focus, textarea:focus { outline:none; border-color:var(--accent); }
-  textarea { width:100%; min-height:160px; font-family:monospace; font-size:0.8rem; }
+  input:focus, textarea:focus, select:focus { outline:none; border-color:var(--accent); }
+  textarea { width:100%; min-height:150px; font-family:monospace; font-size:0.8rem; }
   .btn { display:inline-flex; align-items:center; justify-content:center; border-radius:9px; padding:9px 16px;
     font-weight:700; font-size:0.85rem; cursor:pointer; border:1px solid var(--border); background:var(--surface); color:var(--text); font-family:var(--font); }
   .btn:hover { border-color:var(--accent); }
@@ -31,20 +32,34 @@
   .badge { display:inline-block; border-radius:7px; padding:2px 9px; font-size:0.7rem; font-weight:700; }
   .badge-green { background:rgba(0,200,150,0.14); color:var(--accent); }
   .badge-amber { background:rgba(245,158,11,0.16); color:#F59E0B; }
-  .empty { color:var(--muted); text-align:center; padding:1.5rem; font-size:0.88rem; }
-  table { width:100%; border-collapse:collapse; font-size:0.82rem; }
-  th, td { padding:5px 8px; }
+  .badge-paid  { background:rgba(245,158,11,0.18); color:#F59E0B; }
+  .badge-free  { background:rgba(0,200,150,0.16); color:var(--accent); }
+  .empty { color:var(--muted); text-align:center; padding:1.2rem; font-size:0.86rem; }
+  .item { display:flex; justify-content:space-between; gap:10px; align-items:center; padding:9px 10px; border:1px solid var(--border);
+    border-radius:9px; margin-bottom:7px; background:var(--surface); }
+  .item.sel { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset; }
+  .item .t { font-weight:700; font-size:0.9rem; }
+  .item .s { color:var(--muted); font-size:0.76rem; }
+  .crumb { font-size:0.82rem; color:var(--muted); margin-bottom:0.6rem; }
+  .crumb b { color:var(--text); }
+  .ftree { font-size:0.88rem; }
+  .frow { display:flex; justify-content:space-between; align-items:center; gap:8px; padding:6px 8px; border-radius:8px; }
+  .frow:hover { background:var(--surface); }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  @media(max-width:640px){ .grid2{ grid-template-columns:1fr; } }
   code { background:var(--surface); padding:1px 5px; border-radius:4px; font-size:0.85em; }
   #login-screen { min-height:80vh; display:flex; align-items:center; justify-content:center; }
   .login-card { width:100%; max-width:380px; }
   #toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#111; color:#fff;
     border:1px solid var(--border); padding:10px 20px; border-radius:10px; font-size:0.85rem; z-index:999; opacity:0; transition:opacity .2s; }
+  .disabledcard { opacity:0.5; pointer-events:none; }
+  label.lbl { font-size:0.78rem; color:var(--muted); display:block; margin-bottom:3px; }
 </style>
 </head>
 <body>
 
 <nav class="nav">
-  <div class="nav-inner" style="max-width:980px;">
+  <div class="nav-inner" style="max-width:1000px;">
     <a class="logo" href="index.html">Study<span class="z">Planner</span>&nbsp;Mock · Admin</a>
     <div class="nav-cta">
       <button class="btn-theme" onclick="toggleTheme()" title="Toggle theme">🌙</button>
@@ -57,14 +72,13 @@
 <div id="login-screen" class="container">
   <div class="card login-card">
     <h3>🔐 Admin sign in</h3>
-    <p class="muted" style="margin-bottom:1rem;">Sign in with your Supabase account to create &amp; manage mock tests.</p>
+    <p class="muted" style="margin-bottom:1rem;">Sign in with your Supabase admin account.</p>
     <div style="display:flex;flex-direction:column;gap:10px;">
       <input type="email" id="login-email" placeholder="Email">
       <input type="password" id="login-pass" placeholder="Password">
       <button class="btn btn-green" onclick="adminSignIn()">Sign In</button>
       <div id="login-err" class="muted" style="color:var(--red);"></div>
     </div>
-    <p class="muted" style="margin-top:12px;">No account? Create one in Supabase → Authentication → Users. See <code>supabase/SETUP.md</code>.</p>
   </div>
 </div>
 
@@ -75,10 +89,69 @@
     <button class="btn btn-sm" onclick="adminSignOut()">Sign out</button>
   </div>
 
+  <!-- STEP 1: Categories -->
   <div class="card">
-    <h3>⬆️ Upload a test (JSON)</h3>
-    <p class="muted" style="margin-bottom:10px;">Pick a <code>.json</code> file or paste JSON. Format: see <code>supabase/sample-mock.json</code>. Bilingual <code>{en,hi}</code> &amp; image URLs supported.</p>
-    <div class="row">
+    <h3>① Exam Categories</h3>
+    <div class="hint">Top-level groups like SSC Exams, Railway Exams. Click one to manage its exams.</div>
+    <div id="cat-list"><div class="empty">Loading…</div></div>
+    <div class="grid2" style="margin-top:10px;">
+      <div><label class="lbl">Slug (id, e.g. ssc)</label><input type="text" id="cat-id" placeholder="ssc"></div>
+      <div><label class="lbl">Name</label><input type="text" id="cat-name" placeholder="SSC Exams"></div>
+      <div><label class="lbl">Subtitle</label><input type="text" id="cat-sub" placeholder="CGL, CHSL, MTS, CPO…"></div>
+      <div><label class="lbl">Icon/logo URL (optional)</label><input type="text" id="cat-icon" placeholder="https://…"></div>
+    </div>
+    <div class="row" style="margin-top:10px;">
+      <label class="muted"><input type="checkbox" id="cat-soon"> Coming soon</label>
+      <label class="muted"><input type="checkbox" id="cat-pub" checked> Published</label>
+      <button class="btn btn-green btn-sm" onclick="saveCategory()">Save category</button>
+      <button class="btn btn-sm" onclick="clearCatForm()">Clear</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Exams -->
+  <div class="card" id="exam-card">
+    <h3>② Exams</h3>
+    <div class="crumb" id="exam-crumb"></div>
+    <div class="hint">Exams inside the selected category (e.g. SSC CGL). Click one to manage its folders & tests.</div>
+    <div id="exam-list"><div class="empty">Select a category above.</div></div>
+    <div class="grid2" style="margin-top:10px;">
+      <div><label class="lbl">Slug (id, e.g. cgl)</label><input type="text" id="exam-id" placeholder="cgl"></div>
+      <div><label class="lbl">Name</label><input type="text" id="exam-name" placeholder="SSC CGL"></div>
+      <div><label class="lbl">Subtitle</label><input type="text" id="exam-sub" placeholder="Combined Graduate Level"></div>
+      <div><label class="lbl">Icon/logo URL (optional)</label><input type="text" id="exam-icon" placeholder="https://…"></div>
+    </div>
+    <div class="row" style="margin-top:10px;">
+      <label class="muted"><input type="checkbox" id="exam-pub" checked> Published</label>
+      <button class="btn btn-green btn-sm" onclick="saveExam()">Save exam</button>
+      <button class="btn btn-sm" onclick="clearExamForm()">Clear</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: Folders -->
+  <div class="card" id="folder-card">
+    <h3>③ Folders / Tabs (any depth)</h3>
+    <div class="crumb" id="folder-crumb"></div>
+    <div class="hint">Nested tabs like PYQ Mock → Tier I → 2025 → Sectionals → Reasoning. Add a folder under "(top level)" or under another folder.</div>
+    <div id="folder-tree"><div class="empty">Select an exam above.</div></div>
+    <div class="row" style="margin-top:10px;">
+      <select id="folder-parent" style="min-width:200px;"></select>
+      <input type="text" id="folder-name" placeholder="Folder name (e.g. Tier I)" style="flex:1;min-width:160px;">
+      <button class="btn btn-green btn-sm" onclick="addFolder()">Add folder</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Add a test -->
+  <div class="card" id="addtest-card">
+    <h3>④ Add a Test</h3>
+    <div class="crumb" id="addtest-crumb"></div>
+    <div class="hint">Pick where the test goes, set Free/Paid, then upload its question JSON (see <code>supabase/sample-mock.json</code>).</div>
+    <div class="grid2">
+      <div><label class="lbl">Put inside folder</label><select id="test-folder" style="width:100%;"></select></div>
+      <div><label class="lbl">Access</label>
+        <select id="test-free" style="width:100%;"><option value="free">FREE</option><option value="paid">PAID</option></select>
+      </div>
+    </div>
+    <div class="row" style="margin-top:10px;">
       <input type="file" id="mock-file" accept="application/json,.json" onchange="adminParseFile(this)">
       <button class="btn" onclick="adminTogglePaste()">📋 Paste JSON instead</button>
     </div>
@@ -86,19 +159,21 @@
     <div id="mock-preview" style="margin-top:12px;"></div>
   </div>
 
-  <div class="card">
-    <h3>🖼️ Upload an image</h3>
-    <p class="muted" style="margin-bottom:10px;">Uploads to the <code>mock-images</code> bucket and returns a public URL to paste into a question's <code>question_image</code> / <code>option_image_n</code> / <code>solution_image</code> field.</p>
-    <input type="file" id="mock-img-file" accept="image/*" onchange="adminUploadImage(this)">
-    <div id="mock-img-result" style="margin-top:10px;"></div>
+  <!-- Tests list -->
+  <div class="card" id="tests-card">
+    <div class="row" style="justify-content:space-between;">
+      <h3 style="margin:0;">⑤ Tests in this exam</h3>
+      <button class="btn btn-sm" onclick="adminRefreshTests()">↻ Refresh</button>
+    </div>
+    <div id="mock-tests-list" style="margin-top:10px;"><div class="empty">Select an exam above.</div></div>
   </div>
 
+  <!-- Images -->
   <div class="card">
-    <div class="row" style="justify-content:space-between;">
-      <h3 style="margin:0;">🗂 Existing tests</h3>
-      <button class="btn btn-sm" onclick="adminRefreshList()">↻ Refresh</button>
-    </div>
-    <div id="mock-tests-list" style="margin-top:10px;"><div class="empty">Loading…</div></div>
+    <h3>🖼️ Upload an image</h3>
+    <div class="hint">Returns a public URL to paste into a question's <code>question_image</code> / <code>option_image_n</code> / <code>solution_image</code>, or use as a category/exam logo.</div>
+    <input type="file" id="mock-img-file" accept="image/*" onchange="adminUploadImage(this)">
+    <div id="mock-img-result" style="margin-top:10px;"></div>
   </div>
 </div>
 

@@ -137,6 +137,10 @@ window.SUPABASE_CONFIG = Object.freeze({
         title: test.title,
         exam: test.exam || null,
         tier: test.tier || null,
+        exam_id: test.exam_id || null,
+        folder_id: test.folder_id || null,
+        is_free: test.is_free !== false,
+        language: test.language || "English, Hindi",
         correct_score: test.correct_score != null ? test.correct_score : 2,
         negative_score: test.negative_score != null ? test.negative_score : 0.5,
         section_time_min: test.section_time_min || 15,
@@ -198,6 +202,88 @@ window.SUPABASE_CONFIG = Object.freeze({
       if (res.error) throw res.error;
       var pub = c.storage.from("mock-images").getPublicUrl(path);
       return pub.data.publicUrl;
+    },
+
+    /* ══════════════ TREE: categories → exams → folders → tests ══════════════ */
+
+    /* Public reads */
+    async listCategories(opts) {
+      opts = opts || {};
+      var c = requireClient();
+      var q = c.from("exam_categories").select("*").order("order_index", { ascending: true });
+      if (opts.publishedOnly !== false) q = q.eq("is_published", true);
+      var r = await q; if (r.error) throw r.error; return r.data || [];
+    },
+    async listExams(categoryId, opts) {
+      opts = opts || {};
+      var c = requireClient();
+      var q = c.from("exams").select("*").order("order_index", { ascending: true });
+      if (categoryId) q = q.eq("category_id", categoryId);
+      if (opts.publishedOnly !== false) q = q.eq("is_published", true);
+      var r = await q; if (r.error) throw r.error; return r.data || [];
+    },
+    async listFolders(examId) {
+      var c = requireClient();
+      var r = await c.from("folders").select("*").eq("exam_id", examId)
+        .order("order_index", { ascending: true });
+      if (r.error) throw r.error; return r.data || [];
+    },
+    /* Everything needed to render one exam page: its folders + its published tests */
+    async getExamTree(examId, opts) {
+      opts = opts || {};
+      var c = requireClient();
+      var folders = await this.listFolders(examId);
+      var tq = c.from("mock_tests").select("*").eq("exam_id", examId)
+        .order("created_at", { ascending: true });
+      if (opts.publishedOnly !== false) tq = tq.eq("is_published", true);
+      var tr = await tq; if (tr.error) throw tr.error;
+      return { folders: folders, tests: tr.data || [] };
+    },
+
+    /* Admin writes — categories */
+    async upsertCategory(row) {
+      var c = requireClient();
+      var r = await c.from("exam_categories").upsert(row).select().maybeSingle();
+      if (r.error) throw r.error; return r.data;
+    },
+    async deleteCategory(id) {
+      var c = requireClient();
+      var r = await c.from("exam_categories").delete().eq("id", id);
+      if (r.error) throw r.error; return true;
+    },
+    /* Admin writes — exams */
+    async upsertExam(row) {
+      var c = requireClient();
+      var r = await c.from("exams").upsert(row).select().maybeSingle();
+      if (r.error) throw r.error; return r.data;
+    },
+    async deleteExam(id) {
+      var c = requireClient();
+      var r = await c.from("exams").delete().eq("id", id);
+      if (r.error) throw r.error; return true;
+    },
+    /* Admin writes — folders */
+    async createFolder(row) {
+      var c = requireClient();
+      var r = await c.from("folders").insert(row).select().maybeSingle();
+      if (r.error) throw r.error; return r.data;
+    },
+    async renameFolder(id, name) {
+      var c = requireClient();
+      var r = await c.from("folders").update({ name: name }).eq("id", id);
+      if (r.error) throw r.error; return true;
+    },
+    async deleteFolder(id) {
+      var c = requireClient();
+      var r = await c.from("folders").delete().eq("id", id); // cascades to child folders
+      if (r.error) throw r.error; return true;
+    },
+    /* Admin — all tests (optionally by exam) for management lists */
+    async listAllTests(examId) {
+      var c = requireClient();
+      var q = c.from("mock_tests").select("*").order("created_at", { ascending: false });
+      if (examId) q = q.eq("exam_id", examId);
+      var r = await q; if (r.error) throw r.error; return r.data || [];
     }
   };
 })();

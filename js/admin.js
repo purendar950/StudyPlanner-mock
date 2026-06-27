@@ -1,244 +1,277 @@
-/* StudyPlanner Mock — standalone admin (Supabase only).
-   Login, upload/validate question JSON, manage tests, upload images.
-   Depends on window.MockAPI (js/supabase-config.js). */
+/* StudyPlanner Mock — admin (Supabase). Tree builder: categories → exams → folders → tests. */
 
-var ADMIN = { tests: [], parsed: null, user: null, busy: false };
+var ADMIN = { user:null, cats:[], catId:null, exams:[], examId:null, folders:[], parsed:null, editCat:null, editExam:null, busy:false };
 
-function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-function escAttr(s) { return String(s == null ? '' : s).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
-function toast(msg) {
-  var t = document.getElementById('toast');
-  if (!t) return;
-  t.textContent = msg; t.style.opacity = '1';
-  clearTimeout(t._t); t._t = setTimeout(function () { t.style.opacity = '0'; }, 2800);
-}
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escA(s){ return String(s==null?'':s).replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
+function toast(m){ var t=document.getElementById('toast'); if(!t)return; t.textContent=m; t.style.opacity='1'; clearTimeout(t._t); t._t=setTimeout(function(){t.style.opacity='0';},2800); }
+function slug(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40); }
 
-/* ── Boot / auth gate ── */
-async function adminBoot() {
-  if (!(window.MockAPI && MockAPI.client())) {
+/* ── Auth gate ── */
+async function adminBoot(){
+  if(!(window.MockAPI && MockAPI.client())){
     document.getElementById('login-screen').innerHTML =
       '<div class="card login-card"><h3>⚠️ Supabase not configured</h3>' +
-      '<p class="muted">Set your project <strong>url</strong> + <strong>anon key</strong> in <code>js/supabase-config.js</code> ' +
-      '(see <code>supabase/SETUP.md</code>), then reload.</p></div>';
+      '<p class="muted">Set your keys in <code>js/supabase-config.js</code>.</p></div>';
     return;
   }
-  try { ADMIN.user = await MockAPI.currentUser(); } catch (e) { ADMIN.user = null; }
+  try { ADMIN.user = await MockAPI.currentUser(); } catch(e){ ADMIN.user=null; }
   adminShow();
 }
-
-async function adminShow() {
-  var login = document.getElementById('login-screen');
-  var panel = document.getElementById('panel');
-  if (ADMIN.user) {
+async function adminShow(){
+  var login=document.getElementById('login-screen'), panel=document.getElementById('panel');
+  if(ADMIN.user){
     var ok = await adminVerify();
-    if (!ok) {
-      login.style.display = 'flex';
-      panel.style.display = 'none';
-      var err = document.getElementById('login-err');
-      if (err) err.innerHTML = 'The account <strong>' + (ADMIN.user.email || '') + '</strong> is not an admin. ' +
-        '<a href="#" onclick="adminSignOut();return false;">Sign out</a> and use an admin account.';
+    if(!ok){
+      login.style.display='flex'; panel.style.display='none';
+      var err=document.getElementById('login-err');
+      if(err) err.innerHTML='The account <strong>'+(ADMIN.user.email||'')+'</strong> is not an admin. '+
+        '<a href="#" onclick="adminSignOut();return false;">Sign out</a>';
       return;
     }
-    login.style.display = 'none';
-    panel.style.display = 'block';
+    login.style.display='none'; panel.style.display='block';
     document.getElementById('who').textContent = ADMIN.user.email || '';
-    adminRefreshList();
-  } else {
-    login.style.display = 'flex';
-    panel.style.display = 'none';
-  }
+    adminLoadCategories();
+  } else { login.style.display='flex'; panel.style.display='none'; }
 }
-
-/* Verify the signed-in user is in the public.admins allow-list. */
-async function adminVerify() {
-  try {
-    var c = MockAPI.client();
-    var r = await c.from('admins').select('email').eq('email', ADMIN.user.email).maybeSingle();
-    if (r.error) return false;
-    return !!r.data;
-  } catch (e) { return false; }
+async function adminVerify(){
+  try { var c=MockAPI.client(); var r=await c.from('admins').select('email').eq('email',ADMIN.user.email).maybeSingle();
+    if(r.error) return false; return !!r.data; } catch(e){ return false; }
 }
-
-async function adminSignIn() {
-  var em = (document.getElementById('login-email') || {}).value;
-  var pw = (document.getElementById('login-pass') || {}).value;
-  var err = document.getElementById('login-err');
-  if (err) err.textContent = '';
-  if (!em || !pw) { if (err) err.textContent = 'Enter email and password.'; return; }
-  try {
-    ADMIN.user = await MockAPI.signIn(em.trim(), pw);
-    toast('✅ Signed in');
-    adminShow();
-  } catch (e) { if (err) err.textContent = 'Login failed: ' + (e.message || e); }
+async function adminSignIn(){
+  var em=(document.getElementById('login-email')||{}).value, pw=(document.getElementById('login-pass')||{}).value;
+  var err=document.getElementById('login-err'); if(err) err.textContent='';
+  if(!em||!pw){ if(err) err.textContent='Enter email and password.'; return; }
+  try { ADMIN.user=await MockAPI.signIn(em.trim(),pw); toast('✅ Signed in'); adminShow(); }
+  catch(e){ if(err) err.textContent='Login failed: '+(e.message||e); }
 }
+async function adminSignOut(){ try{ await MockAPI.signOut(); }catch(e){} ADMIN.user=null; adminShow(); }
 
-async function adminSignOut() {
-  try { await MockAPI.signOut(); } catch (e) {}
-  ADMIN.user = null;
-  adminShow();
+/* ── ① Categories ── */
+async function adminLoadCategories(){
+  try { ADMIN.cats = await MockAPI.listCategories({ publishedOnly:false }); } catch(e){ toast('Load failed: '+(e.message||e)); ADMIN.cats=[]; }
+  renderCategories();
 }
-
-/* ── List existing tests ── */
-async function adminRefreshList() {
-  var box = document.getElementById('mock-tests-list');
-  if (!box) return;
-  try { ADMIN.tests = await MockAPI.listTests({ publishedOnly: false }); }
-  catch (e) { box.innerHTML = '<div class="empty">Could not load tests: ' + esc(e.message || String(e)) + '</div>'; return; }
-  if (!ADMIN.tests.length) { box.innerHTML = '<div class="empty">No tests yet. Upload one above.</div>'; return; }
-
-  box.innerHTML = ADMIN.tests.map(function (t) {
-    var pub = t.is_published ? '<span class="badge badge-green">Published</span>' : '<span class="badge badge-amber">Draft</span>';
-    var url = 'test-engine.html?id=' + encodeURIComponent(t.id);
-    return '<div class="card" style="margin-bottom:8px;background:var(--surface);">' +
-      '<div class="row" style="justify-content:space-between;">' +
-        '<div style="flex:1;min-width:220px;">' +
-          '<strong>' + esc(t.title || t.id) + '</strong> ' + pub +
-          '<div class="muted" style="margin-top:3px;">id: <code>' + esc(t.id) + '</code> · ' +
-            (t.total_questions || 0) + ' Qs · ' + (t.total_sections || 0) + ' sections · +' + t.correct_score + ' / -' + t.negative_score + '</div>' +
-          '<div class="muted" style="margin-top:3px;">▶ <a href="' + url + '" target="_blank" style="color:var(--accent);">' + esc(url) + '</a></div>' +
-        '</div>' +
-        '<div class="row" style="flex-shrink:0;align-items:flex-start;">' +
-          '<button class="btn btn-sm" onclick="adminTogglePublish(\'' + escAttr(t.id) + '\',' + (!t.is_published) + ')">' + (t.is_published ? '👁 Unpublish' : '🚀 Publish') + '</button>' +
-          '<button class="btn btn-red btn-sm" onclick="adminDelete(\'' + escAttr(t.id) + '\')">🗑 Delete</button>' +
-        '</div>' +
+function renderCategories(){
+  var box=document.getElementById('cat-list');
+  if(!ADMIN.cats.length){ box.innerHTML='<div class="empty">No categories yet. Add one below.</div>'; return; }
+  box.innerHTML = ADMIN.cats.map(function(c){
+    var sel = ADMIN.catId===c.id ? ' sel':'';
+    return '<div class="item'+sel+'">'+
+      '<div><div class="t">'+esc(c.name)+(c.is_coming_soon?' <span class="badge badge-amber">Coming soon</span>':'')+(c.is_published?'':' <span class="badge badge-amber">Hidden</span>')+'</div>'+
+        '<div class="s">id: '+esc(c.id)+(c.subtitle?' · '+esc(c.subtitle):'')+'</div></div>'+
+      '<div class="row">'+
+        '<button class="btn btn-sm" onclick="selectCategory(\''+escA(c.id)+'\')">Open ▸</button>'+
+        '<button class="btn btn-sm" onclick="editCategory(\''+escA(c.id)+'\')">✏️</button>'+
+        '<button class="btn btn-red btn-sm" onclick="deleteCategory(\''+escA(c.id)+'\')">🗑</button>'+
       '</div></div>';
   }).join('');
 }
-
-async function adminTogglePublish(id, val) {
-  try { await MockAPI.setPublished(id, val); toast('✅ Updated'); adminRefreshList(); }
-  catch (e) { toast('Failed: ' + (e.message || e)); }
+function clearCatForm(){ ADMIN.editCat=null; ['cat-id','cat-name','cat-sub','cat-icon'].forEach(function(i){document.getElementById(i).value='';}); document.getElementById('cat-soon').checked=false; document.getElementById('cat-pub').checked=true; }
+function editCategory(id){ var c=ADMIN.cats.find(function(x){return x.id===id;}); if(!c)return; ADMIN.editCat=id;
+  document.getElementById('cat-id').value=c.id; document.getElementById('cat-name').value=c.name||''; document.getElementById('cat-sub').value=c.subtitle||'';
+  document.getElementById('cat-icon').value=c.icon_url||''; document.getElementById('cat-soon').checked=!!c.is_coming_soon; document.getElementById('cat-pub').checked=c.is_published!==false;
+  window.scrollTo({top:0,behavior:'smooth'}); }
+async function saveCategory(){
+  var id=(document.getElementById('cat-id').value||'').trim()||slug(document.getElementById('cat-name').value);
+  var name=(document.getElementById('cat-name').value||'').trim();
+  if(!id||!name){ toast('Slug and name required.'); return; }
+  try {
+    await MockAPI.upsertCategory({ id:id, name:name, subtitle:(document.getElementById('cat-sub').value||'').trim(),
+      icon_url:(document.getElementById('cat-icon').value||'').trim(), is_coming_soon:document.getElementById('cat-soon').checked,
+      is_published:document.getElementById('cat-pub').checked, order_index:ADMIN.cats.length });
+    toast('✅ Category saved'); clearCatForm(); adminLoadCategories();
+  } catch(e){ toast('Save failed: '+(e.message||e)); }
 }
+async function deleteCategory(id){ if(!confirm('Delete category "'+id+'" and all its exams/folders?'))return;
+  try{ await MockAPI.deleteCategory(id); if(ADMIN.catId===id){ADMIN.catId=null;ADMIN.examId=null;} toast('🗑 Deleted'); adminLoadCategories(); resetExamArea(); }catch(e){ toast('Failed: '+(e.message||e)); } }
 
-async function adminDelete(id) {
-  if (!confirm('Delete test "' + id + '" and all its questions? This cannot be undone.')) return;
-  try { await MockAPI.deleteTest(id); toast('🗑 Deleted'); adminRefreshList(); }
-  catch (e) { toast('Failed: ' + (e.message || e)); }
+function selectCategory(id){ ADMIN.catId=id; ADMIN.examId=null; renderCategories(); loadExams(); resetFolderArea(); }
+
+/* ── ② Exams ── */
+async function loadExams(){
+  var cat=ADMIN.cats.find(function(x){return x.id===ADMIN.catId;});
+  document.getElementById('exam-crumb').innerHTML = cat ? 'Category: <b>'+esc(cat.name)+'</b>' : '';
+  try { ADMIN.exams = await MockAPI.listExams(ADMIN.catId, { publishedOnly:false }); } catch(e){ ADMIN.exams=[]; toast('Load failed: '+(e.message||e)); }
+  renderExams();
 }
-
-/* ── Parse / preview ── */
-function adminTogglePaste() {
-  var ta = document.getElementById('mock-json-text');
-  if (ta) ta.style.display = ta.style.display === 'none' ? 'block' : 'none';
-}
-function adminParseFile(input) {
-  var f = input.files && input.files[0];
-  if (!f) return;
-  var reader = new FileReader();
-  reader.onload = function () { adminTryParse(reader.result); };
-  reader.readAsText(f);
-}
-function adminParseText() {
-  var ta = document.getElementById('mock-json-text');
-  if (ta) adminTryParse(ta.value);
-}
-
-function adminTryParse(raw) {
-  var prev = document.getElementById('mock-preview');
-  ADMIN.parsed = null;
-  if (!raw || !raw.trim()) { if (prev) prev.innerHTML = ''; return; }
-  var obj;
-  try { obj = JSON.parse(raw); }
-  catch (e) { if (prev) prev.innerHTML = '<div class="empty" style="color:var(--red);">❌ Invalid JSON: ' + esc(e.message) + '</div>'; return; }
-
-  var res = adminNormalize(obj);
-  if (!res.ok) { if (prev) prev.innerHTML = '<div class="empty" style="color:var(--red);">❌ ' + res.errors.map(esc).join('<br>') + '</div>'; return; }
-  ADMIN.parsed = { test: res.test, sections: res.sections };
-
-  var totalQ = res.sections.reduce(function (s, sec) { return s + sec.questions.length; }, 0);
-  var rows = res.sections.map(function (sec) {
-    return '<tr><td>' + esc(sec.name) + '</td><td style="text-align:center;">' + sec.questions.length +
-      '</td><td style="text-align:center;">' + (sec.time_min || res.test.section_time_min || 15) + ' min</td></tr>';
+function resetExamArea(){ document.getElementById('exam-list').innerHTML='<div class="empty">Select a category above.</div>'; document.getElementById('exam-crumb').innerHTML=''; resetFolderArea(); }
+function renderExams(){
+  var box=document.getElementById('exam-list');
+  if(!ADMIN.catId){ box.innerHTML='<div class="empty">Select a category above.</div>'; return; }
+  if(!ADMIN.exams.length){ box.innerHTML='<div class="empty">No exams in this category yet. Add one below.</div>'; return; }
+  box.innerHTML = ADMIN.exams.map(function(e){
+    var sel = ADMIN.examId===e.id ? ' sel':'';
+    return '<div class="item'+sel+'"><div><div class="t">'+esc(e.name)+(e.is_published?'':' <span class="badge badge-amber">Hidden</span>')+'</div>'+
+      '<div class="s">id: '+esc(e.id)+(e.subtitle?' · '+esc(e.subtitle):'')+'</div></div>'+
+      '<div class="row"><button class="btn btn-sm" onclick="selectExam(\''+escA(e.id)+'\')">Open ▸</button>'+
+      '<button class="btn btn-sm" onclick="editExam(\''+escA(e.id)+'\')">✏️</button>'+
+      '<button class="btn btn-red btn-sm" onclick="deleteExam(\''+escA(e.id)+'\')">🗑</button></div></div>';
   }).join('');
-
-  prev.innerHTML =
-    '<div style="border:1px solid var(--border);border-radius:10px;padding:12px;">' +
-      '<div style="font-weight:700;margin-bottom:6px;">✅ ' + esc(res.test.title) + ' <span class="muted">(id: ' + esc(res.test.id) + ')</span></div>' +
-      '<div class="muted" style="margin-bottom:8px;">' + totalQ + ' questions · ' + res.sections.length + ' sections · +' +
-        res.test.correct_score + ' / -' + res.test.negative_score + ' · ' + (res.test.is_published ? 'will be PUBLISHED' : 'will be DRAFT') + '</div>' +
-      (res.warnings.length ? '<div class="muted" style="color:#F59E0B;margin-bottom:8px;">⚠ ' + res.warnings.map(esc).join('<br>⚠ ') + '</div>' : '') +
-      '<table><thead><tr style="color:var(--muted);text-align:left;"><th>Section</th><th style="text-align:center;">Questions</th><th style="text-align:center;">Time</th></tr></thead><tbody>' + rows + '</tbody></table>' +
-      '<button class="btn btn-green" style="margin-top:12px;" onclick="adminUpload()">⬆️ Upload to Supabase</button>' +
-    '</div>';
 }
-
-/* Accepts {test, sections:[{name,questions}]} OR {test, questions:[...]} (grouped by topic). */
-function adminNormalize(obj) {
-  var errors = [], warnings = [];
-  if (!obj || typeof obj !== 'object') return { ok: false, errors: ['Root must be a JSON object.'], warnings: [] };
-
-  var test = obj.test || {};
-  if (!test.title) { test.title = test.id || 'Untitled Mock'; warnings.push('No test.title — using "' + test.title + '".'); }
-  if (!test.id) {
-    test.id = String(test.title).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || ('mock-' + Date.now());
-    warnings.push('No test.id — generated "' + test.id + '".');
-  }
-  test.correct_score = (test.correct_score != null) ? Number(test.correct_score) : 2;
-  test.negative_score = (test.negative_score != null) ? Number(test.negative_score) : 0.5;
-  test.section_time_min = (test.section_time_min != null) ? Number(test.section_time_min) : 15;
-  test.is_published = test.is_published !== false;
-
-  var sections = [];
-  if (Array.isArray(obj.sections)) {
-    sections = obj.sections.map(function (s, i) {
-      return { name: s.name || ('Section ' + (i + 1)), time_min: s.time_min || null, questions: Array.isArray(s.questions) ? s.questions : [] };
-    });
-  } else if (Array.isArray(obj.questions)) {
-    var byTopic = {};
-    obj.questions.forEach(function (q) { var t = q.topic || q.section || 'Section 1'; (byTopic[t] = byTopic[t] || []).push(q); });
-    sections = Object.keys(byTopic).map(function (name) { return { name: name, time_min: null, questions: byTopic[name] }; });
-  } else {
-    errors.push('Provide "sections": [{name, questions:[...]}] OR "questions": [...].');
-  }
-
-  var totalQ = 0;
-  sections.forEach(function (sec) {
-    if (!sec.questions.length) warnings.push('Section "' + sec.name + '" has no questions.');
-    sec.questions.forEach(function (q, qi) {
-      totalQ++;
-      var optCount = 0;
-      for (var n = 1; n <= 5; n++) if (q['option_' + n] != null && q['option_' + n] !== '') optCount++;
-      if (optCount < 2) errors.push('Q' + (qi + 1) + ' in "' + sec.name + '": needs at least option_1 and option_2.');
-      if (q.answer == null || q.answer === '') errors.push('Q' + (qi + 1) + ' in "' + sec.name + '": missing "answer".');
-      else if (!q['option_' + String(q.answer)]) warnings.push('Q' + (qi + 1) + ' in "' + sec.name + '": answer "' + q.answer + '" has no matching option.');
-      if (q.question == null || q.question === '') errors.push('Q' + (qi + 1) + ' in "' + sec.name + '": missing "question".');
-    });
-  });
-  if (sections.length && totalQ === 0) errors.push('No questions found.');
-
-  if (errors.length) return { ok: false, errors: errors, warnings: warnings };
-  return { ok: true, errors: [], warnings: warnings, test: test, sections: sections };
-}
-
-async function adminUpload() {
-  if (!ADMIN.parsed) { toast('Nothing to upload.'); return; }
-  if (ADMIN.busy) return;
-  ADMIN.busy = true;
-  toast('⏳ Uploading…');
+function clearExamForm(){ ADMIN.editExam=null; ['exam-id','exam-name','exam-sub','exam-icon'].forEach(function(i){document.getElementById(i).value='';}); document.getElementById('exam-pub').checked=true; }
+function editExam(id){ var e=ADMIN.exams.find(function(x){return x.id===id;}); if(!e)return; ADMIN.editExam=id;
+  document.getElementById('exam-id').value=e.id; document.getElementById('exam-name').value=e.name||''; document.getElementById('exam-sub').value=e.subtitle||'';
+  document.getElementById('exam-icon').value=e.icon_url||''; document.getElementById('exam-pub').checked=e.is_published!==false; }
+async function saveExam(){
+  if(!ADMIN.catId){ toast('Select a category first.'); return; }
+  var id=(document.getElementById('exam-id').value||'').trim()||slug(document.getElementById('exam-name').value);
+  var name=(document.getElementById('exam-name').value||'').trim();
+  if(!id||!name){ toast('Slug and name required.'); return; }
   try {
-    var r = await MockAPI.uploadTest(ADMIN.parsed);
-    toast('✅ Uploaded ' + r.questionCount + ' questions.');
-    ADMIN.parsed = null;
-    var prev = document.getElementById('mock-preview'); if (prev) prev.innerHTML = '<div class="muted">✅ Done.</div>';
-    adminRefreshList();
-  } catch (e) { toast('Upload failed: ' + (e.message || e)); }
-  finally { ADMIN.busy = false; }
+    await MockAPI.upsertExam({ id:id, category_id:ADMIN.catId, name:name, subtitle:(document.getElementById('exam-sub').value||'').trim(),
+      icon_url:(document.getElementById('exam-icon').value||'').trim(), is_published:document.getElementById('exam-pub').checked, order_index:ADMIN.exams.length });
+    toast('✅ Exam saved'); clearExamForm(); loadExams();
+  } catch(e){ toast('Save failed: '+(e.message||e)); }
+}
+async function deleteExam(id){ if(!confirm('Delete exam "'+id+'" and all its folders/tests?'))return;
+  try{ await MockAPI.deleteExam(id); if(ADMIN.examId===id) ADMIN.examId=null; toast('🗑 Deleted'); loadExams(); resetFolderArea(); }catch(e){ toast('Failed: '+(e.message||e)); } }
+
+function selectExam(id){ ADMIN.examId=id; renderExams(); loadFolders(); adminRefreshTests(); }
+
+/* ── ③ Folders ── */
+function resetFolderArea(){
+  document.getElementById('folder-tree').innerHTML='<div class="empty">Select an exam above.</div>';
+  document.getElementById('folder-crumb').innerHTML='';
+  document.getElementById('addtest-crumb').innerHTML='';
+  document.getElementById('folder-parent').innerHTML=''; document.getElementById('test-folder').innerHTML='';
+  document.getElementById('mock-tests-list').innerHTML='<div class="empty">Select an exam above.</div>';
+}
+async function loadFolders(){
+  var ex=ADMIN.exams.find(function(x){return x.id===ADMIN.examId;});
+  var crumb = ex ? 'Exam: <b>'+esc(ex.name)+'</b>' : '';
+  document.getElementById('folder-crumb').innerHTML=crumb;
+  document.getElementById('addtest-crumb').innerHTML=crumb;
+  try { ADMIN.folders = await MockAPI.listFolders(ADMIN.examId); } catch(e){ ADMIN.folders=[]; toast('Load failed: '+(e.message||e)); }
+  renderFolderTree(); populateFolderSelects();
+}
+function childrenOf(pid){ return ADMIN.folders.filter(function(f){ return (f.parent_id||null)===(pid||null); }); }
+function renderFolderTree(){
+  var box=document.getElementById('folder-tree');
+  if(!ADMIN.folders.length){ box.innerHTML='<div class="empty">No folders yet — tests can sit directly in the exam, or add folders below.</div>'; return; }
+  function rec(pid, depth){
+    return childrenOf(pid).map(function(f){
+      return '<div class="frow" style="padding-left:'+(8+depth*18)+'px;">'+
+        '<div>'+(depth?'↳ ':'📁 ')+esc(f.name)+'</div>'+
+        '<div class="row"><button class="btn btn-sm" onclick="renameFolder(\''+f.id+'\')">✏️</button>'+
+        '<button class="btn btn-red btn-sm" onclick="deleteFolder(\''+f.id+'\')">🗑</button></div></div>'+
+        rec(f.id, depth+1);
+    }).join('');
+  }
+  box.innerHTML = rec(null, 0);
+}
+function folderPath(f){ var parts=[f.name]; var p=f.parent_id; var guard=0;
+  while(p && guard<20){ var pf=ADMIN.folders.find(function(x){return x.id===p;}); if(!pf)break; parts.unshift(pf.name); p=pf.parent_id; guard++; } return parts.join(' / '); }
+function populateFolderSelects(){
+  var opts='<option value="">(top level)</option>'+ADMIN.folders.map(function(f){ return '<option value="'+f.id+'">'+esc(folderPath(f))+'</option>'; }).join('');
+  document.getElementById('folder-parent').innerHTML=opts;
+  document.getElementById('test-folder').innerHTML='<option value="">(exam root — no folder)</option>'+
+    ADMIN.folders.map(function(f){ return '<option value="'+f.id+'">'+esc(folderPath(f))+'</option>'; }).join('');
+}
+async function addFolder(){
+  if(!ADMIN.examId){ toast('Select an exam first.'); return; }
+  var name=(document.getElementById('folder-name').value||'').trim();
+  if(!name){ toast('Folder name required.'); return; }
+  var parent=document.getElementById('folder-parent').value||null;
+  try { await MockAPI.createFolder({ exam_id:ADMIN.examId, parent_id:parent, name:name, order_index:childrenOf(parent).length });
+    document.getElementById('folder-name').value=''; toast('✅ Folder added'); loadFolders(); }
+  catch(e){ toast('Failed: '+(e.message||e)); }
+}
+async function renameFolder(id){ var f=ADMIN.folders.find(function(x){return x.id===id;}); if(!f)return;
+  var name=prompt('Rename folder:', f.name); if(!name)return;
+  try{ await MockAPI.renameFolder(id,name.trim()); toast('✅ Renamed'); loadFolders(); }catch(e){ toast('Failed: '+(e.message||e)); } }
+async function deleteFolder(id){ if(!confirm('Delete this folder and its subfolders? Tests inside will move to the exam root.'))return;
+  try{ await MockAPI.deleteFolder(id); toast('🗑 Deleted'); loadFolders(); adminRefreshTests(); }catch(e){ toast('Failed: '+(e.message||e)); } }
+
+/* ── ④ Upload test ── */
+function adminTogglePaste(){ var ta=document.getElementById('mock-json-text'); if(ta) ta.style.display = ta.style.display==='none'?'block':'none'; }
+function adminParseFile(input){ var f=input.files&&input.files[0]; if(!f)return; var r=new FileReader(); r.onload=function(){ adminTryParse(r.result); }; r.readAsText(f); }
+function adminParseText(){ var ta=document.getElementById('mock-json-text'); if(ta) adminTryParse(ta.value); }
+function adminTryParse(raw){
+  var prev=document.getElementById('mock-preview'); ADMIN.parsed=null;
+  if(!raw||!raw.trim()){ if(prev) prev.innerHTML=''; return; }
+  var obj; try{ obj=JSON.parse(raw); }catch(e){ prev.innerHTML='<div class="empty" style="color:var(--red);">❌ Invalid JSON: '+esc(e.message)+'</div>'; return; }
+  var res=adminNormalize(obj);
+  if(!res.ok){ prev.innerHTML='<div class="empty" style="color:var(--red);">❌ '+res.errors.map(esc).join('<br>')+'</div>'; return; }
+  ADMIN.parsed={ test:res.test, sections:res.sections };
+  var totalQ=res.sections.reduce(function(s,sec){return s+sec.questions.length;},0);
+  prev.innerHTML='<div style="border:1px solid var(--border);border-radius:10px;padding:12px;">'+
+    '<div style="font-weight:700;">✅ '+esc(res.test.title)+' <span class="muted">(id: '+esc(res.test.id)+')</span></div>'+
+    '<div class="muted" style="margin:6px 0;">'+totalQ+' questions · '+res.sections.length+' sections · +'+res.test.correct_score+' / -'+res.test.negative_score+'</div>'+
+    (res.warnings.length?'<div class="muted" style="color:#F59E0B;margin-bottom:8px;">⚠ '+res.warnings.map(esc).join('<br>⚠ ')+'</div>':'')+
+    '<button class="btn btn-green" onclick="adminUpload()">⬆️ Upload to this exam</button></div>';
+}
+function adminNormalize(obj){
+  var errors=[],warnings=[];
+  if(!obj||typeof obj!=='object') return {ok:false,errors:['Root must be a JSON object.'],warnings:[]};
+  var test=obj.test||{};
+  if(!test.title){ test.title=test.id||'Untitled Mock'; warnings.push('No test.title — using "'+test.title+'".'); }
+  if(!test.id){ test.id=String(test.title).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||('mock-'+Date.now()); warnings.push('No test.id — generated "'+test.id+'".'); }
+  test.correct_score=(test.correct_score!=null)?Number(test.correct_score):2;
+  test.negative_score=(test.negative_score!=null)?Number(test.negative_score):0.5;
+  test.section_time_min=(test.section_time_min!=null)?Number(test.section_time_min):15;
+  test.is_published=test.is_published!==false;
+  var sections=[];
+  if(Array.isArray(obj.sections)){ sections=obj.sections.map(function(s,i){ return {name:s.name||('Section '+(i+1)),time_min:s.time_min||null,questions:Array.isArray(s.questions)?s.questions:[]}; }); }
+  else if(Array.isArray(obj.questions)){ var by={}; obj.questions.forEach(function(q){ var t=q.topic||q.section||'Section 1'; (by[t]=by[t]||[]).push(q); }); sections=Object.keys(by).map(function(n){ return {name:n,time_min:null,questions:by[n]}; }); }
+  else errors.push('Provide "sections": [{name, questions:[...]}] OR "questions": [...].');
+  var total=0;
+  sections.forEach(function(sec){ if(!sec.questions.length) warnings.push('Section "'+sec.name+'" has no questions.');
+    sec.questions.forEach(function(q,qi){ total++; var oc=0; for(var n=1;n<=5;n++) if(q['option_'+n]!=null&&q['option_'+n]!=='') oc++;
+      if(oc<2) errors.push('Q'+(qi+1)+' in "'+sec.name+'": needs option_1 and option_2.');
+      if(q.answer==null||q.answer==='') errors.push('Q'+(qi+1)+' in "'+sec.name+'": missing "answer".');
+      if(q.question==null||q.question==='') errors.push('Q'+(qi+1)+' in "'+sec.name+'": missing "question".'); }); });
+  if(sections.length&&total===0) errors.push('No questions found.');
+  if(errors.length) return {ok:false,errors:errors,warnings:warnings};
+  return {ok:true,errors:[],warnings:warnings,test:test,sections:sections};
+}
+async function adminUpload(){
+  if(!ADMIN.parsed){ toast('Nothing to upload.'); return; }
+  if(!ADMIN.examId){ toast('Select an exam first.'); return; }
+  if(ADMIN.busy) return; ADMIN.busy=true; toast('⏳ Uploading…');
+  try{
+    var p=ADMIN.parsed;
+    p.test.exam_id=ADMIN.examId;
+    p.test.folder_id=document.getElementById('test-folder').value||null;
+    p.test.is_free=document.getElementById('test-free').value!=='paid';
+    var r=await MockAPI.uploadTest(p);
+    toast('✅ Uploaded '+r.questionCount+' questions.');
+    ADMIN.parsed=null; var prev=document.getElementById('mock-preview'); if(prev) prev.innerHTML='<div class="muted">✅ Done.</div>';
+    var ta=document.getElementById('mock-json-text'); if(ta) ta.value=''; var fi=document.getElementById('mock-file'); if(fi) fi.value='';
+    adminRefreshTests();
+  }catch(e){ toast('Upload failed: '+(e.message||e)); }
+  finally{ ADMIN.busy=false; }
 }
 
-async function adminUploadImage(input) {
-  var f = input.files && input.files[0];
-  if (!f) return;
-  var box = document.getElementById('mock-img-result');
-  if (box) box.innerHTML = '<div class="muted">⏳ Uploading…</div>';
-  try {
-    var path = Date.now() + '-' + f.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-    var url = await MockAPI.uploadImage(f, path);
-    if (box) box.innerHTML = '<div class="muted">✅ Uploaded. Public URL:</div>' +
-      '<input type="text" readonly value="' + esc(url) + '" style="width:100%;margin-top:4px;" onclick="this.select()">' +
-      '<div style="margin-top:8px;"><img src="' + esc(url) + '" style="max-width:200px;max-height:120px;border:1px solid var(--border);border-radius:6px;"></div>';
-  } catch (e) {
-    if (box) box.innerHTML = '<div class="empty" style="color:var(--red);">Upload failed: ' + esc(e.message || String(e)) + '</div>';
-  }
+/* ── ⑤ Tests list ── */
+async function adminRefreshTests(){
+  var box=document.getElementById('mock-tests-list'); if(!box) return;
+  if(!ADMIN.examId){ box.innerHTML='<div class="empty">Select an exam above.</div>'; return; }
+  var tests;
+  try{ tests=await MockAPI.listAllTests(ADMIN.examId); }catch(e){ box.innerHTML='<div class="empty">Load failed: '+esc(e.message||e)+'</div>'; return; }
+  if(!tests.length){ box.innerHTML='<div class="empty">No tests in this exam yet. Add one above.</div>'; return; }
+  box.innerHTML = tests.map(function(t){
+    var fpath = t.folder_id ? (ADMIN.folders.find(function(f){return f.id===t.folder_id;})||{}) : null;
+    var loc = fpath && fpath.name ? folderPath(fpath) : '(exam root)';
+    var url='test-engine.html?id='+encodeURIComponent(t.id);
+    return '<div class="item"><div style="flex:1;min-width:200px;">'+
+      '<div class="t">'+esc(t.title||t.id)+' '+(t.is_free===false?'<span class="badge badge-paid">PAID</span>':'<span class="badge badge-free">FREE</span>')+(t.is_published?'':' <span class="badge badge-amber">Draft</span>')+'</div>'+
+      '<div class="s">📁 '+esc(loc)+' · '+(t.total_questions||0)+' Qs · '+(t.total_sections||0)+' sections · ▶ <a href="'+url+'" target="_blank" style="color:var(--accent);">open</a></div></div>'+
+      '<div class="row"><button class="btn btn-sm" onclick="adminTogglePublish(\''+escA(t.id)+'\','+(!t.is_published)+')">'+(t.is_published?'👁 Unpublish':'🚀 Publish')+'</button>'+
+      '<button class="btn btn-red btn-sm" onclick="adminDeleteTest(\''+escA(t.id)+'\')">🗑</button></div></div>';
+  }).join('');
+}
+async function adminTogglePublish(id,val){ try{ await MockAPI.setPublished(id,val); toast('✅ Updated'); adminRefreshTests(); }catch(e){ toast('Failed: '+(e.message||e)); } }
+async function adminDeleteTest(id){ if(!confirm('Delete test "'+id+'"?'))return; try{ await MockAPI.deleteTest(id); toast('🗑 Deleted'); adminRefreshTests(); }catch(e){ toast('Failed: '+(e.message||e)); } }
+
+/* ── Images ── */
+async function adminUploadImage(input){
+  var f=input.files&&input.files[0]; if(!f)return;
+  var box=document.getElementById('mock-img-result'); if(box) box.innerHTML='<div class="muted">⏳ Uploading…</div>';
+  try{ var path=Date.now()+'-'+f.name.replace(/[^a-zA-Z0-9._-]/g,'_'); var url=await MockAPI.uploadImage(f,path);
+    if(box) box.innerHTML='<div class="muted">✅ Public URL:</div><input type="text" readonly value="'+esc(url)+'" style="width:100%;margin-top:4px;" onclick="this.select()">'+
+      '<div style="margin-top:8px;"><img src="'+esc(url)+'" style="max-width:200px;max-height:120px;border:1px solid var(--border);border-radius:6px;"></div>';
+  }catch(e){ if(box) box.innerHTML='<div class="empty" style="color:var(--red);">Upload failed: '+esc(e.message||e)+'</div>'; }
 }
 
 adminBoot();
