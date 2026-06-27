@@ -12,8 +12,8 @@
      <script src="js/core/supabase-config.js"></script>
    ══════════════════════════════════════════════════════════════ */
 window.SUPABASE_CONFIG = Object.freeze({
-  url:     "YOUR_SUPABASE_URL",        // e.g. https://abcdxyz.supabase.co
-  anonKey: "YOUR_SUPABASE_ANON_KEY"    // e.g. eyJhbGciOi...
+  url:     "https://bhhxulecdpqnsiaogmoc.supabase.co",
+  anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaHh1bGVjZHBxbnNpYW9nbW9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI1MjQ2MTYsImV4cCI6MjA5ODEwMDYxNn0.vdqIwXiIx9OSIoiBkX_o78MbYSDp5dN6303xKuXn4P4"
 });
 
 (function () {
