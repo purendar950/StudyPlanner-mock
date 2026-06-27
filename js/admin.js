@@ -388,10 +388,25 @@ function normalizeQuestion(q){
   if(q.topic==null && q.topic_id!=null) q.topic=String(q.topic_id);
   if(q.positive_marks==null && q.marks!=null) q.positive_marks=Number(q.marks);
 
+  function takeOpt(val,idx){
+    if(val==null) return;
+    if(typeof val==='object') val = val.text || val.value || val.label || val.en || val.hi || '';
+    if(q['option_'+idx]==null || q['option_'+idx]==='') q['option_'+idx]=val;
+  }
   if(Array.isArray(q.options)){
-    q.options.forEach(function(opt,i){ if(q['option_'+(i+1)]==null) q['option_'+(i+1)]=opt; });
+    q.options.forEach(function(opt,i){ takeOpt(opt,i+1); });
     delete q.options;
   }
+  if(Array.isArray(q.choices)) q.choices.forEach(function(opt,i){ takeOpt(opt,i+1); });
+  if(Array.isArray(q.answers)) q.answers.forEach(function(opt,i){ takeOpt(opt,i+1); });
+  var optionAliases=[
+    ['option1','optionA','option_a','opt1','optA','opt_a','A','a'],
+    ['option2','optionB','option_b','opt2','optB','opt_b','B','b'],
+    ['option3','optionC','option_c','opt3','optC','opt_c','C','c'],
+    ['option4','optionD','option_d','opt4','optD','opt_d','D','d'],
+    ['option5','optionE','option_e','opt5','optE','opt_e','E','e']
+  ];
+  optionAliases.forEach(function(keys,i){ keys.forEach(function(k){ if(q[k]!=null) takeOpt(q[k],i+1); }); });
   if((q.explanation==null||q.explanation==='') && q.solution!=null) q.explanation=q.solution;
 
   var optionVals=[];
