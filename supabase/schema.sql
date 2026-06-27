@@ -83,6 +83,29 @@ create trigger trg_mock_tests_touch
   before update on public.mock_tests
   for each row execute function public.touch_updated_at();
 
+-- ────────────────────────────────────────────────────────────────────────
+--  ADMIN ALLOW-LIST
+--  Only emails listed in public.admins may create/edit tests & questions.
+--  Everyone else who signs up (students) is a normal authenticated user
+--  who can only read published tests and save their own attempts.
+--  ➜ After creating your admin auth user, add its email here, e.g.:
+--      insert into public.admins (email) values ('you@example.com');
+-- ────────────────────────────────────────────────────────────────────────
+create table if not exists public.admins (
+  email      text primary key,
+  created_at timestamptz default now()
+);
+alter table public.admins enable row level security;
+drop policy if exists "admins_self_read" on public.admins;
+create policy "admins_self_read" on public.admins
+  for select to authenticated using (email = (auth.jwt() ->> 'email'));
+
+create or replace function public.is_admin()
+returns boolean
+language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.admins a where a.email = (auth.jwt() ->> 'email'));
+$$;
+
 -- ════════════════════════════════════════════════════════════════════════
 --  ROW LEVEL SECURITY
 --  Reads: anyone (anon key) can read PUBLISHED tests + their questions.
@@ -105,13 +128,13 @@ drop policy if exists "tests_admin_delete"     on public.mock_tests;
 create policy "tests_public_read" on public.mock_tests
   for select using (is_published = true);
 create policy "tests_admin_read_all" on public.mock_tests
-  for select to authenticated using (true);
+  for select to authenticated using (public.is_admin());
 create policy "tests_admin_write" on public.mock_tests
-  for insert to authenticated with check (true);
+  for insert to authenticated with check (public.is_admin());
 create policy "tests_admin_update" on public.mock_tests
-  for update to authenticated using (true) with check (true);
+  for update to authenticated using (public.is_admin()) with check (public.is_admin());
 create policy "tests_admin_delete" on public.mock_tests
-  for delete to authenticated using (true);
+  for delete to authenticated using (public.is_admin());
 
 -- ── mock_questions ──
 drop policy if exists "q_public_read"   on public.mock_questions;
@@ -126,13 +149,13 @@ create policy "q_public_read" on public.mock_questions
             where t.id = mock_questions.test_id and t.is_published = true)
   );
 create policy "q_admin_read_all" on public.mock_questions
-  for select to authenticated using (true);
+  for select to authenticated using (public.is_admin());
 create policy "q_admin_write" on public.mock_questions
-  for insert to authenticated with check (true);
+  for insert to authenticated with check (public.is_admin());
 create policy "q_admin_update" on public.mock_questions
-  for update to authenticated using (true) with check (true);
+  for update to authenticated using (public.is_admin()) with check (public.is_admin());
 create policy "q_admin_delete" on public.mock_questions
-  for delete to authenticated using (true);
+  for delete to authenticated using (public.is_admin());
 
 -- ── mock_attempts ──
 drop policy if exists "att_public_read"   on public.mock_attempts;
@@ -159,8 +182,8 @@ drop policy if exists "mock_images_admin_delete" on storage.objects;
 create policy "mock_images_public_read" on storage.objects
   for select using (bucket_id = 'mock-images');
 create policy "mock_images_admin_write" on storage.objects
-  for insert to authenticated with check (bucket_id = 'mock-images');
+  for insert to authenticated with check (bucket_id = 'mock-images' and public.is_admin());
 create policy "mock_images_admin_update" on storage.objects
-  for update to authenticated using (bucket_id = 'mock-images');
+  for update to authenticated using (bucket_id = 'mock-images' and public.is_admin());
 create policy "mock_images_admin_delete" on storage.objects
-  for delete to authenticated using (bucket_id = 'mock-images');
+  for delete to authenticated using (bucket_id = 'mock-images' and public.is_admin());

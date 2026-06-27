@@ -2,14 +2,13 @@
 <html lang="en" data-theme="dark">
 <head>
 <script>
-  // Apply saved theme instantly (shared with the test engine) — no flash
   (function(){ var t = localStorage.getItem('mmh_theme'); if(t) document.documentElement.setAttribute('data-theme', t); })();
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>StudyPlanner Mock — Mock Tests for SSC, Railway, Banking & UPSC</title>
-<meta name="description" content="StudyPlanner Mock — free & premium mock tests for competitive exams: SSC CGL, CHSL, MTS, GD, RRB NTPC, IBPS PO, UPSC and more. Real test interface with sectional timers, solutions and analysis.">
+<meta name="description" content="StudyPlanner Mock — free & premium mock tests for competitive exams: SSC CGL, CHSL, MTS, GD, RRB NTPC, IBPS PO, UPSC and more.">
 <link rel="stylesheet" href="css/style.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -22,6 +21,9 @@
   .mock-hero h1 { font-size:clamp(1.9rem,5vw,3rem); font-weight:800; letter-spacing:-0.03em; margin-bottom:0.6rem; }
   .mock-hero h1 .z { color:var(--accent); }
   .mock-hero p { color:var(--muted); max-width:520px; margin:0 auto; font-size:1.02rem; }
+
+  .acct { display:flex; align-items:center; gap:10px; }
+  .acct .hi { font-size:0.82rem; color:var(--muted); max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
   .toolbar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:1.5rem 0 0.5rem; }
   .search { flex:1; min-width:220px; background:var(--card); border:1px solid var(--border); color:var(--text);
@@ -53,6 +55,27 @@
   .skeleton { height:150px; border-radius:16px; background:linear-gradient(90deg,var(--card),var(--surface),var(--card));
     background-size:200% 100%; animation:sk 1.2s infinite; }
   @keyframes sk { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+
+  /* Auth modal */
+  .ov { position:fixed; inset:0; z-index:1000; display:none; align-items:center; justify-content:center; padding:1rem;
+    background:rgba(5,8,12,0.72); backdrop-filter:blur(6px); }
+  .ov.open { display:flex; }
+  .modal { width:100%; max-width:380px; background:var(--card); border:1px solid var(--border);
+    border-radius:18px; padding:1.6rem 1.4rem; position:relative; }
+  .modal h2 { font-size:1.2rem; margin-bottom:0.3rem; }
+  .modal .sub { color:var(--muted); font-size:0.84rem; margin-bottom:1rem; }
+  .modal .x { position:absolute; top:12px; right:14px; background:none; border:none; color:var(--muted); font-size:1.4rem; cursor:pointer; }
+  .tabs { display:flex; gap:6px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:4px; margin-bottom:1rem; }
+  .tab { flex:1; text-align:center; padding:8px; border-radius:7px; font-size:0.85rem; font-weight:700; cursor:pointer; color:var(--muted); }
+  .tab.active { background:var(--accent); color:#000; }
+  .fld { display:flex; flex-direction:column; gap:5px; margin-bottom:0.8rem; }
+  .fld label { font-size:0.78rem; color:var(--muted); }
+  .fld input { background:var(--surface); border:1px solid var(--border); color:var(--text);
+    border-radius:9px; padding:10px 12px; font-family:var(--font); font-size:0.9rem; }
+  .fld input:focus { outline:none; border-color:var(--accent); }
+  .pane { display:none; } .pane.active { display:block; }
+  .msg { font-size:0.8rem; margin-top:6px; min-height:18px; }
+  .msg.err { color:var(--red); } .msg.ok { color:var(--accent); }
 </style>
 </head>
 <body>
@@ -62,7 +85,7 @@
     <a class="logo" href="index.html">Study<span class="z">Planner</span>&nbsp;Mock</a>
     <div class="nav-cta">
       <button class="btn-theme" id="theme-btn" title="Toggle theme" onclick="toggleTheme()">🌙</button>
-      <a class="btn btn-ghost" href="admin.html">Admin</a>
+      <div class="acct" id="acct"></div>
     </div>
   </div>
 </nav>
@@ -87,99 +110,194 @@
   <div class="container foot" style="max-width:1080px;">
     <a class="logo" href="index.html" style="font-size:0.95rem;">Study<span class="z">Planner</span>&nbsp;Mock</a>
     <div>© 2026 StudyPlanner Mock · Mock tests for competitive exams.</div>
-    <div style="display:flex;gap:1rem;"><a href="admin.html">Admin</a></div>
   </div>
 </footer>
 
+<!-- AUTH MODAL -->
+<div class="ov" id="auth-ov" onclick="if(event.target===this)closeAuth()">
+  <div class="modal">
+    <button class="x" onclick="closeAuth()">×</button>
+    <h2>Welcome 👋</h2>
+    <div class="sub">Sign in or create a free account to take mock tests.</div>
+    <div class="tabs">
+      <div class="tab active" id="t-login" onclick="authTab('login')">Sign In</div>
+      <div class="tab" id="t-signup" onclick="authTab('signup')">Sign Up</div>
+    </div>
+
+    <div class="pane active" id="p-login">
+      <div class="fld"><label>Email</label><input type="email" id="li-email" placeholder="you@example.com"></div>
+      <div class="fld"><label>Password</label><input type="password" id="li-pass" placeholder="••••••••"></div>
+      <button class="tc-start" style="width:100%;" onclick="doLogin()">Sign In</button>
+      <div class="msg" id="li-msg"></div>
+    </div>
+
+    <div class="pane" id="p-signup">
+      <div class="fld"><label>Full name</label><input type="text" id="su-name" placeholder="Your name"></div>
+      <div class="fld"><label>Email</label><input type="email" id="su-email" placeholder="you@example.com"></div>
+      <div class="fld"><label>Password</label><input type="password" id="su-pass" placeholder="Min. 6 characters"></div>
+      <button class="tc-start" style="width:100%;" onclick="doSignup()">Create Account</button>
+      <div class="msg" id="su-msg"></div>
+    </div>
+  </div>
+</div>
+
 <script>
-  /* ── Theme toggle (shared key with the engine) ── */
-  function applyThemeButton() {
-    var dark = document.documentElement.getAttribute('data-theme') !== 'light';
-    var b = document.getElementById('theme-btn'); if (b) b.textContent = dark ? '🌙' : '☀️';
-  }
   function toggleTheme() {
     var dark = document.documentElement.getAttribute('data-theme') !== 'light';
     var next = dark ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('mmh_theme', next);
-    applyThemeButton();
+    applyThemeBtn();
   }
+  function applyThemeBtn(){ var b=document.getElementById('theme-btn'); if(b) b.textContent = document.documentElement.getAttribute('data-theme')==='light'?'☀️':'🌙'; }
   if (!localStorage.getItem('mmh_theme')) document.documentElement.setAttribute('data-theme', 'dark');
-  applyThemeButton();
-
-  /* ── Friendly exam labels ── */
-  var EXAM_LABELS = {
-    cgl:'SSC CGL', chsl:'SSC CHSL', mts:'SSC MTS', cpo:'SSC CPO', steno:'SSC Steno',
-    gd:'SSC GD', ntpc:'RRB NTPC', 'group-d':'RRB Group D', rrb:'RRB',
-    ibps:'IBPS PO', sbi:'SBI PO', bank:'Banking', upsc:'UPSC CSE', uppcs:'UPPCS', bpsc:'BPSC'
-  };
-  function examLabel(e) { if (!e) return 'General'; return EXAM_LABELS[String(e).toLowerCase()] || String(e).toUpperCase(); }
-
-  var ALL_TESTS = [];
-  var ACTIVE_EXAM = 'all';
+  applyThemeBtn();
 
   function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  var SB = window._supabase || null;
+  var CURRENT_USER = null;
+  var pendingTestId = null;
+
+  /* ── Account / session ── */
+  async function refreshSession() {
+    if (!SB) return;
+    try { var r = await SB.auth.getUser(); CURRENT_USER = (r && r.data) ? r.data.user : null; }
+    catch(e){ CURRENT_USER = null; }
+    renderAcct();
+    syncIdentity();
+  }
+  function userName(u){ return (u && u.user_metadata && u.user_metadata.full_name) || (u && u.email) || 'Student'; }
+  function syncIdentity(){
+    try {
+      if (CURRENT_USER) {
+        localStorage.setItem('ez_user_uid', CURRENT_USER.id);
+        localStorage.setItem('ez_user_name', userName(CURRENT_USER));
+      } else {
+        localStorage.removeItem('ez_user_uid');
+        localStorage.removeItem('ez_user_name');
+      }
+    } catch(e){}
+  }
+  function renderAcct() {
+    var box = document.getElementById('acct');
+    if (!box) return;
+    if (!SB) { box.innerHTML = ''; return; }
+    if (CURRENT_USER) {
+      box.innerHTML = '<span class="hi">Hi, ' + esc(userName(CURRENT_USER)) + '</span>' +
+        '<button class="btn btn-ghost" onclick="doLogout()">Log out</button>';
+    } else {
+      box.innerHTML = '<button class="btn btn-green" onclick="openAuth(\'login\')">Sign In</button>';
+    }
+  }
+
+  /* ── Auth modal ── */
+  function openAuth(tab){ authTab(tab||'login'); document.getElementById('auth-ov').classList.add('open'); }
+  function closeAuth(){ document.getElementById('auth-ov').classList.remove('open'); }
+  function authTab(which){
+    document.getElementById('t-login').classList.toggle('active', which==='login');
+    document.getElementById('t-signup').classList.toggle('active', which==='signup');
+    document.getElementById('p-login').classList.toggle('active', which==='login');
+    document.getElementById('p-signup').classList.toggle('active', which==='signup');
+  }
+
+  async function doLogin(){
+    var m = document.getElementById('li-msg'); m.className='msg'; m.textContent='Signing in…';
+    var email=(document.getElementById('li-email').value||'').trim();
+    var pass=document.getElementById('li-pass').value||'';
+    if(!email||!pass){ m.className='msg err'; m.textContent='Enter email and password.'; return; }
+    try {
+      var r = await SB.auth.signInWithPassword({ email:email, password:pass });
+      if (r.error) throw r.error;
+      CURRENT_USER = r.data.user; syncIdentity(); renderAcct();
+      m.className='msg ok'; m.textContent='Welcome!';
+      closeAuth();
+      if (pendingTestId){ var id=pendingTestId; pendingTestId=null; startTest(id); }
+    } catch(e){ m.className='msg err'; m.textContent = e.message || 'Login failed.'; }
+  }
+
+  async function doSignup(){
+    var m = document.getElementById('su-msg'); m.className='msg'; m.textContent='Creating account…';
+    var name=(document.getElementById('su-name').value||'').trim();
+    var email=(document.getElementById('su-email').value||'').trim();
+    var pass=document.getElementById('su-pass').value||'';
+    if(!name||!email||!pass){ m.className='msg err'; m.textContent='Fill all fields.'; return; }
+    if(pass.length<6){ m.className='msg err'; m.textContent='Password must be at least 6 characters.'; return; }
+    try {
+      var r = await SB.auth.signUp({ email:email, password:pass, options:{ data:{ full_name:name } } });
+      if (r.error) throw r.error;
+      if (r.data.session) {
+        CURRENT_USER = r.data.user; syncIdentity(); renderAcct();
+        m.className='msg ok'; m.textContent='Account created!';
+        closeAuth();
+        if (pendingTestId){ var id=pendingTestId; pendingTestId=null; startTest(id); }
+      } else {
+        m.className='msg ok';
+        m.textContent='Account created! Please check your email to confirm, then sign in.';
+        authTab('login');
+      }
+    } catch(e){ m.className='msg err'; m.textContent = e.message || 'Sign up failed.'; }
+  }
+
+  async function doLogout(){ try{ await SB.auth.signOut(); }catch(e){} CURRENT_USER=null; syncIdentity(); renderAcct(); }
+
+  /* ── Tests ── */
+  var EXAM_LABELS = { cgl:'SSC CGL', chsl:'SSC CHSL', mts:'SSC MTS', cpo:'SSC CPO', steno:'SSC Steno',
+    gd:'SSC GD', ntpc:'RRB NTPC', 'group-d':'RRB Group D', rrb:'RRB', ibps:'IBPS PO', sbi:'SBI PO',
+    bank:'Banking', upsc:'UPSC CSE', uppcs:'UPPCS', bpsc:'BPSC' };
+  function examLabel(e){ if(!e) return 'General'; return EXAM_LABELS[String(e).toLowerCase()] || String(e).toUpperCase(); }
+
+  var ALL_TESTS = [], ACTIVE_EXAM = 'all';
 
   async function loadTests() {
     var grid = document.getElementById('grid');
     if (!(window.MockAPI && MockAPI.configured)) {
-      grid.innerHTML = '<div class="state">⚠️ Mock tests are not connected yet.<br>Set your Supabase keys in <code>js/supabase-config.js</code> (see <code>supabase/SETUP.md</code>).</div>';
+      grid.innerHTML = '<div class="state">⚠️ Mock tests are not connected yet. Set your keys in <code>js/supabase-config.js</code>.</div>';
       return;
     }
-    try {
-      ALL_TESTS = await MockAPI.listTests({ publishedOnly: true });
-    } catch (e) {
-      grid.innerHTML = '<div class="state">Could not load tests: ' + esc(e.message || String(e)) + '</div>';
-      return;
-    }
-    renderChips();
-    renderTests();
+    try { ALL_TESTS = await MockAPI.listTests({ publishedOnly: true }); }
+    catch (e) { grid.innerHTML = '<div class="state">Could not load tests: ' + esc(e.message || String(e)) + '</div>'; return; }
+    renderChips(); renderTests();
   }
-
   function renderChips() {
     var exams = {};
-    ALL_TESTS.forEach(function(t){ var k = (t.exam || '').toLowerCase(); if (k) exams[k] = (exams[k]||0)+1; });
+    ALL_TESTS.forEach(function(t){ var k=(t.exam||'').toLowerCase(); if(k) exams[k]=(exams[k]||0)+1; });
     var keys = Object.keys(exams).sort();
     var html = '<div class="chip ' + (ACTIVE_EXAM==='all'?'active':'') + '" onclick="setExam(\'all\')">All (' + ALL_TESTS.length + ')</div>';
-    keys.forEach(function(k){
-      html += '<div class="chip ' + (ACTIVE_EXAM===k?'active':'') + '" onclick="setExam(\'' + k + '\')">' + esc(examLabel(k)) + ' (' + exams[k] + ')</div>';
-    });
+    keys.forEach(function(k){ html += '<div class="chip ' + (ACTIVE_EXAM===k?'active':'') + '" onclick="setExam(\'' + k + '\')">' + esc(examLabel(k)) + ' (' + exams[k] + ')</div>'; });
     document.getElementById('chips').innerHTML = keys.length ? html : '';
   }
-
-  function setExam(e) { ACTIVE_EXAM = e; renderChips(); renderTests(); }
-
+  function setExam(e){ ACTIVE_EXAM=e; renderChips(); renderTests(); }
   function renderTests() {
     var grid = document.getElementById('grid');
     var q = (document.getElementById('search').value || '').toLowerCase().trim();
     var list = ALL_TESTS.filter(function(t){
-      if (ACTIVE_EXAM !== 'all' && (t.exam || '').toLowerCase() !== ACTIVE_EXAM) return false;
-      if (q && !((t.title||'') + ' ' + (t.exam||'') + ' ' + (t.id||'')).toLowerCase().includes(q)) return false;
+      if (ACTIVE_EXAM!=='all' && (t.exam||'').toLowerCase()!==ACTIVE_EXAM) return false;
+      if (q && !((t.title||'')+' '+(t.exam||'')+' '+(t.id||'')).toLowerCase().includes(q)) return false;
       return true;
     });
-    if (!list.length) {
-      grid.innerHTML = '<div class="state">No mock tests found' + (q ? ' for "' + esc(q) + '"' : '') + '.</div>';
-      return;
-    }
+    if (!list.length) { grid.innerHTML = '<div class="state">No mock tests found' + (q?' for "'+esc(q)+'"':'') + '.</div>'; return; }
     grid.innerHTML = list.map(function(t){
       return '<div class="test-card">' +
         '<div class="tc-top"><div class="tc-title">' + esc(t.title || t.id) + '</div>' +
-          '<span class="tag">' + esc(examLabel(t.exam)) + (t.tier ? ' · ' + esc(String(t.tier).toUpperCase()) : '') + '</span></div>' +
-        '<div class="tc-meta">' +
-          '<span><b>' + (t.total_questions||0) + '</b> Qs</span>' +
+          '<span class="tag">' + esc(examLabel(t.exam)) + (t.tier?' · '+esc(String(t.tier).toUpperCase()):'') + '</span></div>' +
+        '<div class="tc-meta"><span><b>' + (t.total_questions||0) + '</b> Qs</span>' +
           '<span><b>' + (t.total_sections||0) + '</b> sections</span>' +
-          '<span>+<b>' + t.correct_score + '</b> / -<b>' + t.negative_score + '</b></span>' +
-        '</div>' +
+          '<span>+<b>' + t.correct_score + '</b> / -<b>' + t.negative_score + '</b></span></div>' +
         '<button class="tc-start" onclick="startTest(\'' + String(t.id).replace(/'/g,"\\'") + '\')">▶ Start Test</button>' +
       '</div>';
     }).join('');
   }
 
+  /* Require login before taking a test */
   function startTest(id) {
+    if (!CURRENT_USER) { pendingTestId = id; openAuth('login'); return; }
+    syncIdentity();
     window.location.href = 'test-engine.html?id=' + encodeURIComponent(id);
   }
 
-  loadTests();
+  // Boot
+  (async function(){ await refreshSession(); loadTests(); })();
 </script>
 </body>
 </html>

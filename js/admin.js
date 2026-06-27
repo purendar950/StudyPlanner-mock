@@ -26,10 +26,19 @@ async function adminBoot() {
   adminShow();
 }
 
-function adminShow() {
+async function adminShow() {
   var login = document.getElementById('login-screen');
   var panel = document.getElementById('panel');
   if (ADMIN.user) {
+    var ok = await adminVerify();
+    if (!ok) {
+      login.style.display = 'flex';
+      panel.style.display = 'none';
+      var err = document.getElementById('login-err');
+      if (err) err.innerHTML = 'The account <strong>' + (ADMIN.user.email || '') + '</strong> is not an admin. ' +
+        '<a href="#" onclick="adminSignOut();return false;">Sign out</a> and use an admin account.';
+      return;
+    }
     login.style.display = 'none';
     panel.style.display = 'block';
     document.getElementById('who').textContent = ADMIN.user.email || '';
@@ -38,6 +47,16 @@ function adminShow() {
     login.style.display = 'flex';
     panel.style.display = 'none';
   }
+}
+
+/* Verify the signed-in user is in the public.admins allow-list. */
+async function adminVerify() {
+  try {
+    var c = MockAPI.client();
+    var r = await c.from('admins').select('email').eq('email', ADMIN.user.email).maybeSingle();
+    if (r.error) return false;
+    return !!r.data;
+  } catch (e) { return false; }
 }
 
 async function adminSignIn() {
