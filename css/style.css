@@ -21,7 +21,7 @@
   /* NAV */
   .nav { border-bottom:1px solid var(--border); }
   .nav-inner { display:flex; align-items:center; justify-content:space-between; height:64px; max-width:760px; margin:0 auto; padding:0 1.25rem; }
-  .logo { font-weight:800; font-size:1.25rem; display:flex; align-items:center; gap:9px; }
+  .logo { font-weight:800; font-size:1.25rem; display:flex; align-items:center; gap:6px; letter-spacing:-0.02em; }
   .logo .z { color:var(--accent); }
   .brand-logo { width:40px; height:40px; border-radius:9px; object-fit:contain; flex-shrink:0; }
   .auth-logo .brand-logo { width:46px; height:46px; }
