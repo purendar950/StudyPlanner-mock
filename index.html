@@ -141,6 +141,13 @@
       <button class="btn-w" onclick="doSignup()">Create Account</button>
       <div class="msg" id="su-msg"></div>
     </div>
+    <div style="display:flex;align-items:center;gap:10px;margin:14px 0 10px;color:var(--muted);font-size:0.78rem;">
+      <span style="flex:1;height:1px;background:var(--border);"></span>OR<span style="flex:1;height:1px;background:var(--border);"></span>
+    </div>
+    <button onclick="doGoogle()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:11px;font-weight:700;cursor:pointer;font-family:var(--font);">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#4285F4" d="M47.5 24.6c0-1.6-.1-3.1-.4-4.6H24v8.7h13.2c-.6 3-2.3 5.5-5 7.2v6h8c4.7-4.3 7.3-10.7 7.3-17.3z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-8-6c-2.1 1.4-4.8 2.3-7.9 2.3-6.1 0-11.2-4.1-13-9.6H3v6.2C7 42.7 15 48 24 48z"/><path fill="#FBBC05" d="M11 28.9c-.5-1.4-.7-2.9-.7-4.4s.3-3 .7-4.4V14H3C1.1 17.6 0 21.7 0 26s1.1 8.4 3 12l8-6.1z"/><path fill="#EA4335" d="M24 9.5c3.4 0 6.5 1.2 8.9 3.5l6.6-6.6C35.8 2.5 30.4 0 24 0 15 0 7 5.3 3 13.1l8 6.2C12.8 13.6 17.9 9.5 24 9.5z"/></svg>
+      Continue with Google
+    </button>
   </div>
 </div>
 
@@ -194,6 +201,14 @@
       if(r.data.session){ CURRENT_USER=r.data.user; syncIdentity(); renderAcct(); closeAuth(); await loadAttempts(); navTo('exams'); if(pendingTestId){ var id=pendingTestId; pendingTestId=null; startTest(id);} }
       else { m.className='msg ok'; m.textContent='Account created! Check your email to confirm, then sign in.'; authTab('login'); } }
     catch(e){ m.className='msg err'; m.textContent=e.message||'Sign up failed.'; } }
+  async function doGoogle(){
+    if(!SB){ alert('Not connected.'); return; }
+    try{
+      var url = window.location.origin + window.location.pathname;
+      var r = await SB.auth.signInWithOAuth({ provider:'google', options:{ redirectTo:url } });
+      if(r.error) throw r.error;
+    }catch(e){ alert('Google sign-in failed: ' + (e.message||e)); }
+  }
   async function doLogout(){ try{ await SB.auth.signOut(); }catch(e){} try{ sessionStorage.removeItem('sp_nav'); }catch(e){} CURRENT_USER=null; syncIdentity(); renderAcct(); renderShell(); }
 
   /* ── Attempts (for Start vs Analysis/Reattempt + Profile) ── */
