@@ -16,11 +16,47 @@
   .acct { display:flex; align-items:center; gap:10px; }
   .acct .hi { font-size:0.82rem; color:var(--muted); max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
-  /* hero (logged-out) */
-  .hero2 { padding:3.2rem 1.25rem 2rem; text-align:center; background:radial-gradient(700px 380px at 50% 20%, rgba(0,200,150,0.10), transparent); }
-  .hero2 h1 { font-size:clamp(1.9rem,5vw,3rem); font-weight:800; letter-spacing:-0.03em; margin-bottom:0.6rem; }
+  /* landing (logged-out) */
+  .hero2 { position:relative; overflow:hidden; padding:3.8rem 1.25rem 2.4rem; background:
+    radial-gradient(720px 360px at 18% 10%, rgba(20,184,166,.22), transparent 62%),
+    radial-gradient(680px 360px at 88% 18%, rgba(59,130,246,.16), transparent 62%),
+    linear-gradient(180deg, rgba(255,255,255,.035), transparent 70%); }
+  .hero2::before { content:''; position:absolute; inset:0; opacity:.12; pointer-events:none; background-image:linear-gradient(var(--border) 1px, transparent 1px),linear-gradient(90deg,var(--border) 1px, transparent 1px); background-size:42px 42px; mask-image:linear-gradient(to bottom,#000,transparent 75%); }
+  .landing-wrap { position:relative; max-width:1120px; margin:0 auto; }
+  .hero-grid { display:grid; grid-template-columns:1.08fr .92fr; gap:2rem; align-items:center; }
+  .hero-copy { text-align:left; }
+  .hero-badge { display:inline-flex; align-items:center; gap:.45rem; border:1px solid rgba(20,184,166,.35); background:rgba(20,184,166,.10); color:var(--accent); border-radius:999px; padding:.45rem .8rem; font-weight:800; font-size:.8rem; margin-bottom:1rem; }
+  .hero2 h1 { font-size:clamp(2.25rem,6vw,4.65rem); line-height:.98; font-weight:900; letter-spacing:-0.065em; margin:0 0 1rem; }
   .hero2 h1 .z { color:var(--accent); }
-  .hero2 p { color:var(--muted); max-width:520px; margin:0 auto 1.4rem; font-size:1.02rem; }
+  .hero2 p { color:var(--muted); max-width:640px; margin:0 0 1.35rem; font-size:clamp(1rem,2vw,1.16rem); line-height:1.75; }
+  .hero-actions { display:flex; flex-wrap:wrap; gap:.8rem; margin:1.35rem 0 1rem; }
+  .hero-proof { display:flex; flex-wrap:wrap; gap:.65rem; color:var(--muted); font-size:.88rem; }
+  .hero-proof span { border:1px solid var(--border); background:var(--card); border-radius:999px; padding:.45rem .7rem; }
+  .mock-preview { background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025)); border:1px solid var(--border); border-radius:28px; padding:1rem; box-shadow:0 24px 80px rgba(0,0,0,.28); }
+  .preview-top { display:flex; justify-content:space-between; align-items:center; padding:.55rem .65rem 1rem; color:var(--muted); font-weight:700; font-size:.82rem; }
+  .timer-pill { color:#071312; background:var(--accent); border-radius:999px; padding:.38rem .65rem; }
+  .question-card { background:var(--bg); border:1px solid var(--border); border-radius:22px; padding:1.1rem; }
+  .q-meta { display:flex; justify-content:space-between; color:var(--muted); font-size:.78rem; margin-bottom:.8rem; }
+  .q-title { font-weight:800; line-height:1.5; margin-bottom:.85rem; }
+  .opt { display:flex; gap:.65rem; align-items:center; padding:.75rem; margin:.55rem 0; border:1px solid var(--border); background:var(--card); border-radius:14px; color:var(--text); }
+  .opt b { display:grid; place-items:center; width:26px; height:26px; border-radius:50%; background:rgba(20,184,166,.15); color:var(--accent); }
+  .preview-foot { display:grid; grid-template-columns:repeat(3,1fr); gap:.65rem; margin-top:.9rem; }
+  .mini-stat { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:.8rem; }
+  .mini-stat strong { display:block; font-size:1.18rem; color:var(--text); }
+  .mini-stat span { color:var(--muted); font-size:.76rem; }
+  .landing-section { position:relative; max-width:1120px; margin:1.2rem auto 0; }
+  .section-title { text-align:center; margin:2.4rem auto 1.2rem; max-width:680px; }
+  .section-title h2 { font-size:clamp(1.55rem,3vw,2.25rem); letter-spacing:-.035em; margin-bottom:.45rem; }
+  .section-title p { color:var(--muted); line-height:1.65; }
+  .exam-chips { display:flex; flex-wrap:wrap; justify-content:center; gap:.75rem; margin:1.2rem 0 1.6rem; }
+  .exam-chip { border:1px solid var(--border); background:var(--card); border-radius:999px; padding:.75rem 1rem; font-weight:800; }
+  .feature-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
+  .feature-card { background:var(--card); border:1px solid var(--border); border-radius:22px; padding:1.15rem; text-align:left; }
+  .feature-card .ico { font-size:1.45rem; margin-bottom:.65rem; }
+  .feature-card h3 { font-size:1rem; margin-bottom:.45rem; }
+  .feature-card p { color:var(--muted); font-size:.9rem; line-height:1.55; margin:0; }
+  @media (max-width:860px){ .hero-grid{ grid-template-columns:1fr; } .hero-copy{text-align:center;} .hero2 p{margin-left:auto;margin-right:auto;} .hero-actions,.hero-proof{justify-content:center;} .feature-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:560px){ .hero2{padding-top:2.6rem;} .feature-grid{grid-template-columns:1fr;} .preview-foot{grid-template-columns:1fr;} }
 
   /* app */
   .appbar { display:flex; align-items:center; gap:12px; padding:0.9rem 0; }
@@ -94,13 +130,58 @@
   </div>
 </nav>
 
-<!-- LOGGED-OUT HERO -->
+<!-- LOGGED-OUT LANDING -->
 <header class="hero2" id="hero" style="display:none;">
-  <div class="hero-badge">🎯 SSC · Railway · Banking · UPSC</div>
-  <h1>Mock tests for <span class="z">competitive exams</span></h1>
-  <p>Sign in to access full mocks & sectional tests in a real exam interface — sectional timers, bilingual questions, instant solutions and analysis.</p>
-  <button class="btn btn-green btn-big" onclick="openAuth('signup')">🚀 Create free account</button>
-  <button class="btn btn-ghost btn-big" onclick="openAuth('login')">Sign In</button>
+  <div class="landing-wrap">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <div class="hero-badge">🎯 Exam-ready mocks for serious aspirants</div>
+        <h1>Practice like the <span class="z">real exam</span>. Improve with every mock.</h1>
+        <p>StudyPlanner Mock gives you full-length and sectional tests for SSC, Railway, Banking and UPSC with timed sections, bilingual questions, instant solutions and attempt analysis.</p>
+        <div class="hero-actions">
+          <button class="btn btn-green btn-big" onclick="openAuth('signup')">🚀 Start free practice</button>
+          <button class="btn btn-ghost btn-big" onclick="openAuth('login')">I already have an account</button>
+        </div>
+        <div class="hero-proof">
+          <span>⚡ Sectional timers</span>
+          <span>📚 Full mocks + sectionals</span>
+          <span>✅ Instant solutions</span>
+        </div>
+      </div>
+      <div class="mock-preview" aria-label="Mock test interface preview">
+        <div class="preview-top"><span>SSC CGL Mock Test</span><span class="timer-pill">14:58 left</span></div>
+        <div class="question-card">
+          <div class="q-meta"><span>Quantitative Aptitude · Q7</span><span>+2 / -0.5</span></div>
+          <div class="q-title">If a train covers 240 km in 3 hours, what is its average speed?</div>
+          <div class="opt"><b>A</b><span>60 km/h</span></div>
+          <div class="opt"><b>B</b><span>75 km/h</span></div>
+          <div class="opt"><b>C</b><span>80 km/h</span></div>
+          <div class="opt"><b>D</b><span>90 km/h</span></div>
+        </div>
+        <div class="preview-foot">
+          <div class="mini-stat"><strong>25</strong><span>Questions</span></div>
+          <div class="mini-stat"><strong>4</strong><span>Sections</span></div>
+          <div class="mini-stat"><strong>Live</strong><span>Analysis</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="landing-section">
+      <div class="section-title">
+        <h2>Everything your mock-test project needs</h2>
+        <p>A clean student experience built around real exam practice, fast navigation and focused revision.</p>
+      </div>
+      <div class="exam-chips">
+        <span class="exam-chip">SSC CGL</span><span class="exam-chip">Railway</span><span class="exam-chip">Banking</span><span class="exam-chip">UPSC</span><span class="exam-chip">Sectionals</span>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card"><div class="ico">⏱️</div><h3>Real exam feel</h3><p>Timed sections, question palette and focused test flow.</p></div>
+        <div class="feature-card"><div class="ico">🌐</div><h3>Bilingual ready</h3><p>Supports English and Hindi question content cleanly.</p></div>
+        <div class="feature-card"><div class="ico">📈</div><h3>Attempt tracking</h3><p>Review performance and continue improving test by test.</p></div>
+        <div class="feature-card"><div class="ico">🧩</div><h3>Organized exams</h3><p>Categories, exams, folders, full mocks and sectional tests.</p></div>
+      </div>
+    </div>
+  </div>
 </header>
 
 <!-- APP (logged in) -->
