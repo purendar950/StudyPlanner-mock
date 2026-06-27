@@ -17,8 +17,12 @@ function showScreen(name){
 function setTitle(t){ var el=document.getElementById('adm-title'); if(el) el.textContent=t; }
 function catName(){ var c=ADMIN.cats.find(function(x){return x.id===ADMIN.catId;}); return c?c.name:'Exams'; }
 function admBack(){
-  if(ADMIN.screen==='exam'){ showScreen('exams'); setTitle(catName()); }
-  else if(ADMIN.screen==='exams'){ ADMIN.catId=null; showScreen('categories'); setTitle('Exam Categories'); }
+  if(ADMIN.screen==='exam'){
+    // step up one folder level first, if we're inside folders
+    if(ADMIN.fpath && ADMIN.fpath.length){ ADMIN.fpath.pop(); renderFolders(); return; }
+    showScreen('exams'); setTitle(catName()); return;
+  }
+  if(ADMIN.screen==='exams'){ ADMIN.catId=null; showScreen('categories'); setTitle('Exam Categories'); }
 }
 
 /* ── Auth gate ── */
