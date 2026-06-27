@@ -274,16 +274,20 @@ function adminNormalize(obj){
   var errors=[],warnings=[];
   if(!obj||typeof obj!=='object') return {ok:false,errors:['Root must be a JSON object.'],warnings:[]};
 
-  // ── Test config: accept obj.test OR obj.meta ──
+  // ── Test config: accept obj.test OR obj.meta (+ top-level title/quiz_id) ──
   var test = obj.test ? Object.assign({}, obj.test) : {};
   var timer = null;
-  if(obj.meta && !obj.test){
-    var m=obj.meta;
-    test.title = m.title;
-    if(m.correct_score!=null)  test.correct_score = m.correct_score;
-    if(m.negative_score!=null) test.negative_score = m.negative_score;
-    if(m.timer_minutes!=null)  timer = Number(m.timer_minutes);
-    if(m.id) test.id = m.id;
+  if(!obj.test){
+    var m=obj.meta||{};
+    test.title = obj.title || m.title || test.title;
+    test.id = obj.quiz_id || m.id || obj.id || test.id;
+    var cs=(m.correct_score!=null)?m.correct_score:(m.marksPerQ!=null?m.marksPerQ:null);
+    var ns=(m.negative_score!=null)?m.negative_score:(m.neg!=null?m.neg:null);
+    if(cs!=null) test.correct_score=cs;
+    if(ns!=null) test.negative_score=ns;
+    if(m.timer_minutes!=null) timer=Number(m.timer_minutes);
+    else if(m.mins!=null) timer=Number(m.mins);
+    else if(m.time!=null) timer=Math.max(1,Math.round(Number(m.time)/60));   // seconds → minutes
   }
   if(!test.title){ test.title=test.id||'Untitled Mock'; warnings.push('No title — using "'+test.title+'".'); }
   if(!test.id){ test.id=String(test.title).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||('mock-'+Date.now()); warnings.push('No id — generated "'+test.id+'".'); }
@@ -332,9 +336,18 @@ function normalizeQuestion(q){
     delete q.options;
   }
   if((q.explanation==null||q.explanation==='') && q.solution!=null) q.explanation=q.solution;
+  // Answer resolution. Supported: answer (1-based number or A/B/C/D) | correct (0-based index) | answer_index (0-based)
+  if((q.answer==null||q.answer==='')){
+    if(q.correct!=null){
+      if(/^\d+$/.test(String(q.correct))) q.answer=String(Number(q.correct)+1);   // correct is 0-based
+      else q.answer=String(q.correct);
+    } else if(q.answer_index!=null && /^\d+$/.test(String(q.answer_index))){
+      q.answer=String(Number(q.answer_index)+1);
+    }
+  }
   if(q.answer!=null){
     var a=String(q.answer).trim();
-    if(/^[A-Ea-e]$/.test(a)) q.answer=String('abcde'.indexOf(a.toLowerCase())+1); // A/B/C/D → 1/2/3/4
+    if(/^[A-Ea-e]$/.test(a)) q.answer=String('abcde'.indexOf(a.toLowerCase())+1);   // A/B/C/D → 1/2/3/4
     else q.answer=a;
   }
   return q;
