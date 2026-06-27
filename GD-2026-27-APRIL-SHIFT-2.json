@@ -1,0 +1,2180 @@
+{
+  "status": 200,
+  "meta": {
+    "title": "GD 2026 27 APR SHIFT 2",
+    "total_questions": 80,
+    "correct_score": "2",
+    "negative_score": "0.25",
+    "timer_minutes": "60"
+  },
+  "sections": {
+    "REASONING": [
+      {
+        "id": "50001",
+        "question": {
+          "en": "Select the option that is related to the fourth letter cluster in the same way as the first letter cluster is related to the second letter cluster and the fifth letter cluster is related to the sixth letter cluster.<br>LK : GE :: ? : YD :: FG : AA",
+          "hi": "उस विकल्प का चयन करें जो चौथे अक्षर समूह से उसी प्रकार संबंधित है जिस प्रकार पहला अक्षर समूह दूसरे अक्षर समूह से संबंधित है तथा पांचवां अक्षर समूह छठे अक्षर समूह से संबंधित है।<br>LK : GE :: ? : YD :: FG : AA"
+        },
+        "options": [
+          {
+            "en": "DI",
+            "hi": "DI"
+          },
+          {
+            "en": "CK",
+            "hi": "CK"
+          },
+          {
+            "en": "DJ",
+            "hi": "DJ"
+          },
+          {
+            "en": "BJ",
+            "hi": "BJ"
+          }
+        ],
+        "answer": "3",
+        "solution": null
+      },
+      {
+        "id": "50002",
+        "question": {
+          "en": "2nd of a month is Monday. This month has 31 days. What will be the 10th of next month?",
+          "hi": "किसी महीने की दूसरी तिथि को सोमवार है। इस महीने में 31 दिन हैं। अगले महीने की 10वीं तिथि को कौन सा दिन होगा?"
+        },
+        "options": [
+          {
+            "en": "Sunday",
+            "hi": "रविवार"
+          },
+          {
+            "en": "Saturday",
+            "hi": "शनिवार"
+          },
+          {
+            "en": "Friday",
+            "hi": "शुक्रवार"
+          },
+          {
+            "en": "Thursday",
+            "hi": "गुरुवार"
+          }
+        ],
+        "answer": "3",
+        "solution": null
+      },
+      {
+        "id": "50003",
+        "question": {
+          "en": "What was the first day of the year 1666?",
+          "hi": "वर्ष 1666 का पहला दिन कौन सा था?"
+        },
+        "options": [
+          {
+            "en": "Sunday",
+            "hi": "रविवार"
+          },
+          {
+            "en": "Saturday",
+            "hi": "शनिवार"
+          },
+          {
+            "en": "Friday",
+            "hi": "शुक्रवार"
+          },
+          {
+            "en": "Monday",
+            "hi": "सोमवार"
+          }
+        ],
+        "answer": "3",
+        "solution": null
+      },
+      {
+        "id": "50004",
+        "question": {
+          "en": "Runs scored by 5 boys R, B, C, L and Q are compared. Runs of no two boys are same. Runs of B are less than Q but more than C. Runs of L are more than R but less than C. Which of the following is the correct sequence of runs scored by these boys?<br>**I. Q &gt; L &gt; R**<br>**II. B &gt; L &gt; C**",
+          "hi": "5 लड़कों R, B, C, L और Q द्वारा बनाए गए रनों की तुलना की जाती है। कोई भी दो लड़कों के रन समान नहीं हैं। B के रन Q से कम हैं लेकिन C से अधिक हैं। L के रन R से अधिक हैं लेकिन C से कम हैं। इन लड़कों द्वारा बनाए गए रनों का सही अनुक्रम निम्नलिखित में से कौन सा है?<br>**I. Q &gt; L &gt; R**<br>**II. B &gt; L &gt; C**"
+        },
+        "options": [
+          {
+            "en": "Only I",
+            "hi": "केवल I"
+          },
+          {
+            "en": "Only II",
+            "hi": "केवल II"
+          },
+          {
+            "en": "Both I and II",
+            "hi": "I और II दोनों"
+          },
+          {
+            "en": "Neither I nor II",
+            "hi": "न तो I और न ही II"
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50005",
+        "question": {
+          "en": "Height of 6 boys M, N, O, P, Q and R is compared. Height of M is less than only Q and O. Height of P is more than R but less than N. Height of no two boys is same. O is the tallest boy among these boys. Height of which of the following is less than M but more than P?",
+          "hi": "6 लड़कों M, N, O, P, Q और R की ऊंचाई की तुलना की जाती है। M की ऊंचाई केवल Q और O से कम है। P की ऊंचाई R से अधिक है लेकिन N से कम है। किसी भी दो लड़कों की ऊंचाई समान नहीं है। O इन लड़कों में सबसे लंबा है। निम्नलिखित में से किसकी ऊंचाई M से कम लेकिन P से अधिक है?"
+        },
+        "options": [
+          {
+            "en": "O",
+            "hi": "O"
+          },
+          {
+            "en": "R",
+            "hi": "R"
+          },
+          {
+            "en": "Q",
+            "hi": "Q"
+          },
+          {
+            "en": "N",
+            "hi": "N"
+          }
+        ],
+        "answer": "4",
+        "solution": null
+      },
+      {
+        "id": "50006",
+        "question": {
+          "en": "By rearranging the letters of the word 'EAGLES', which of the following words can be formed?",
+          "hi": "'EAGLES' शब्द के अक्षरों को फिर से व्यवस्थित करके, निम्नलिखित में से कौन-सा शब्द बनाया जा सकता है?"
+        },
+        "options": [
+          {
+            "en": "SAGE",
+            "hi": "SAGE"
+          },
+          {
+            "en": "LEGS",
+            "hi": "LEGS"
+          },
+          {
+            "en": "GALE",
+            "hi": "GALE"
+          },
+          {
+            "en": "ALL OF THESE",
+            "hi": "ये सभी"
+          }
+        ],
+        "answer": "4",
+        "solution": null
+      },
+      {
+        "id": "50007",
+        "question": {
+          "en": "Pooja is older than Neha but younger than Rina. Seema is younger than Neha but older than Kiran.<br>Who is the youngest?",
+          "hi": "पूजा, नेहा से बड़ी है लेकिन रीना से छोटी है। सीमा, नेहा से छोटी है लेकिन किरण से बड़ी है।<br>सबसे छोटा कौन है?"
+        },
+        "options": [
+          {
+            "en": "Neha",
+            "hi": "नेहा"
+          },
+          {
+            "en": "Pooja",
+            "hi": "पूजा"
+          },
+          {
+            "en": "Seema",
+            "hi": "सीमा"
+          },
+          {
+            "en": "Kiran",
+            "hi": "किरण"
+          }
+        ],
+        "answer": "4",
+        "solution": null
+      },
+      {
+        "id": "50008",
+        "question": {
+          "en": "In the following question, two statements are given followed by two conclusions I and II. You have to consider the two statements to be true even if they seem to be at variance from commonly known facts and then decide which of the given conclusion(s) logically follows/follow from the given statements.<br>**Statements:**<br>1. All the trains are cats.<br>2. Some bikes are cats.<br>**Conclusions:**<br>I. All the trains are bikes.<br>II. Some bikes are trains.",
+          "hi": "निम्नलिखित प्रश्न में दो कथन और उसके बाद I और II से अंकित दो निष्कर्ष दिए गए हैं। आपको दोनों कथनों को सत्य मानना है, भले ही वे ज्ञात तथ्यों से अलग प्रतीत होते हों। सभी निष्कर्षों को पढ़िए और फिर तय कीजिए कि दिए गए निष्कर्षों में से कौन-से निष्कर्ष, दिए गए कथनों का तार्किक रूप से अनुसरण करते हैं।<br>**कथन:**<br>1. सभी रेलगाड़ियाँ, बिल्लियाँ हैं।<br>2. कुछ बाइक, बिल्लियाँ हैं।<br>**निष्कर्ष:**<br>I. सभी रेलगाड़ियाँ, बाइक हैं।<br>II. कुछ बाइक, रेलगाड़ियाँ हैं।"
+        },
+        "options": [
+          {
+            "en": "Only conclusion I follows",
+            "hi": "केवल निष्कर्ष I अनुसरण करता है"
+          },
+          {
+            "en": "Only conclusion II follows",
+            "hi": "केवल निष्कर्ष II अनुसरण करता है"
+          },
+          {
+            "en": "Both conclusions I and II follow",
+            "hi": "निष्कर्ष I और II दोनों अनुसरण करते हैं"
+          },
+          {
+            "en": "Neither conclusion I nor II follows",
+            "hi": "न तो निष्कर्ष I और न ही निष्कर्ष II अनुसरण करता है"
+          }
+        ],
+        "answer": "4",
+        "solution": null
+      },
+      {
+        "id": "50009",
+        "question": {
+          "en": "Complete the analogy.<br>CFI : HMO :: BDF : ?",
+          "hi": "निम्नलिखित सादृश्यता को पूरा करें।<br>CFI : HMO :: BDF : ?"
+        },
+        "options": [
+          {
+            "en": "IOP",
+            "hi": ""
+          },
+          {
+            "en": "ILN",
+            "hi": ""
+          },
+          {
+            "en": "HLP",
+            "hi": ""
+          },
+          {
+            "en": "GKL",
+            "hi": ""
+          }
+        ],
+        "answer": "4",
+        "solution": null
+      },
+      {
+        "id": "50010",
+        "question": {
+          "en": "Complete the analogy.<br>BEG : CFH :: DFH : ?",
+          "hi": "निम्नलिखित सादृश्यता को पूरा करें।<br>BEG : CFH :: DFH : ?"
+        },
+        "options": [
+          {
+            "en": "EGI",
+            "hi": ""
+          },
+          {
+            "en": "FHI",
+            "hi": ""
+          },
+          {
+            "en": "EHK",
+            "hi": ""
+          },
+          {
+            "en": "FIK",
+            "hi": ""
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50011",
+        "question": {
+          "en": "In the question, assuming the given statements to be true, find which of the conclusion(s) among the given two conclusions is/are definitely true and then give your answer accordingly.<br>**Statements:** L = F &lt; D ≤ R; Y = T ≥ Q = L<br>**Conclusions:**<br>I. T &gt; F<br>II. F ≤ Y",
+          "hi": "प्रश्न में, दिए गए कथनों को सत्य मानते हुए, ज्ञात कीजिए कि दिए गए दो निष्कर्षों में से कौन-से निष्कर्ष निश्चित रूप से सत्य हैं और फिर उसके अनुसार उत्तर दीजिए।<br>**कथन:** L = F &lt; D ≤ R; Y = T ≥ Q = L<br>**निष्कर्ष:**<br>I. T &gt; F<br>II. F ≤ Y"
+        },
+        "options": [
+          {
+            "en": "Only conclusion I is true",
+            "hi": "केवल निष्कर्ष I सत्य है"
+          },
+          {
+            "en": "Both conclusions I and II are true",
+            "hi": "निष्कर्ष I और II दोनों सत्य हैं"
+          },
+          {
+            "en": "Only conclusion II is true",
+            "hi": "केवल निष्कर्ष II सत्य है"
+          },
+          {
+            "en": "Neither conclusion I nor II is true",
+            "hi": "न तो निष्कर्ष I और न ही निष्कर्ष II सत्य है"
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50012",
+        "question": {
+          "en": "Find the missing number in the series.<br>840, 820, 780, 720, ?",
+          "hi": "निम्नलिखित श्रृंखला में लुप्त संख्या ज्ञात करें।<br>840, 820, 780, 720, ?"
+        },
+        "options": [
+          {
+            "en": "640",
+            "hi": ""
+          },
+          {
+            "en": "650",
+            "hi": ""
+          },
+          {
+            "en": "660",
+            "hi": ""
+          },
+          {
+            "en": "670",
+            "hi": ""
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50013",
+        "question": {
+          "en": "Find the missing term in the series.<br>AAB1, BCE2, CEH3, ?, EIN5",
+          "hi": "निम्नलिखित श्रृंखला में लुप्त पद ज्ञात करें।<br>AAB1, BCE2, CEH3, ?, EIN5"
+        },
+        "options": [
+          {
+            "en": "DGL4",
+            "hi": ""
+          },
+          {
+            "en": "DGK4",
+            "hi": ""
+          },
+          {
+            "en": "DHK3",
+            "hi": ""
+          },
+          {
+            "en": "EGK3",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50014",
+        "question": {
+          "en": "A company's monthly revenue (in Rs.) for January, February, March, and April was 75,000, 82,500, 90,750, and 99,825. If the same trend continues, what will be the revenue in June?",
+          "hi": "कंपनी की मासिक आय (Rs. में) जनवरी, फरवरी, मार्च और अप्रैल के लिए क्रमशः 75,000, 82,500, 90,750 और 99,825 थी। यदि यही प्रवृत्ति जारी रहती है, तो जून में आय कितनी होगी?"
+        },
+        "options": [
+          {
+            "en": "Rs.1,50,168.33",
+            "hi": ""
+          },
+          {
+            "en": "Rs.1,40,712.56",
+            "hi": ""
+          },
+          {
+            "en": "Rs.1,20,788.25",
+            "hi": ""
+          },
+          {
+            "en": "Rs.1,70,128.56",
+            "hi": ""
+          }
+        ],
+        "answer": "3",
+        "solution": null
+      },
+      {
+        "id": "50015",
+        "question": {
+          "en": "Which number completes the analogy?<br>12 : 144 :: 9 : 81 :: 7 : 49 :: 8 : __",
+          "hi": "कौन-सी संख्या सादृश्यता को पूरा करेगी?<br>12 : 144 :: 9 : 81 :: 7 : 49 :: 8 : __"
+        },
+        "options": [
+          {
+            "en": "49",
+            "hi": ""
+          },
+          {
+            "en": "64",
+            "hi": ""
+          },
+          {
+            "en": "144",
+            "hi": ""
+          },
+          {
+            "en": "81",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50016",
+        "question": {
+          "en": "Two figures given on the left side of (::) are related with some logic/rule/relation. Select the missing figure on the right side of (::) from the given alternatives based on the same logic/rule/relation.<br>&lt;image&gt;",
+          "hi": "(::) के बायीं ओर दी गयी दो आकृतियाँ किसी तर्क/नियम/संबंध से संबंधित हैं। समान तर्क/नियम/संबंध के आधार पर दिए गए विकल्पों में से (::) के दाईं ओर लुप्त आकृति का चयन कीजिए।<br>&lt;image&gt;"
+        },
+        "options": [
+          {
+            "en": "&lt;image&gt;",
+            "hi": ""
+          },
+          {
+            "en": "&lt;image&gt;",
+            "hi": ""
+          },
+          {
+            "en": "&lt;image&gt;",
+            "hi": ""
+          },
+          {
+            "en": "&lt;image&gt;",
+            "hi": ""
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50017",
+        "question": {
+          "en": "Select the option that is related to the fifth letter-number cluster in the same way as the second letter-number cluster is related to the first letter-number cluster and fourth letter-number cluster is related to third letter-number cluster.<br>(NOTE: Operations should be performed on the whole numbers, without breaking down the numbers into its constituent digits.)<br>TL210 : JV105 :: EK320 : IG160 :: DL500 : ?",
+          "hi": "उस विकल्प का चयन करें जो पांचवें अक्षर-संख्या समूह से उसी प्रकार संबंधित है जिस प्रकार दूसरा अक्षर-संख्या समूह पहले अक्षर-संख्या समूह से संबंधित है और चौथा अक्षर-संख्या समूह तीसरे अक्षर-संख्या समूह से संबंधित है।<br>(ध्यान दें: संख्याओं पर उनके घटक अंकों में विभाजित किए बिना, पूर्ण संख्याओं पर संक्रियाएँ की जानी चाहिए।)<br>TL210 : JV105 :: EK320 : IG160 :: DL500 : ?"
+        },
+        "options": [
+          {
+            "en": "FG250",
+            "hi": ""
+          },
+          {
+            "en": "JG250",
+            "hi": ""
+          },
+          {
+            "en": "JF250",
+            "hi": ""
+          },
+          {
+            "en": "FK250",
+            "hi": ""
+          }
+        ],
+        "answer": "3",
+        "solution": null
+      },
+      {
+        "id": "50018",
+        "question": {
+          "en": "Arrange the given words in the sequence in which they occur in the dictionary.<br>1. Cylinder<br>2. Cyclone<br>3. Cycle<br>4. Cymbal<br>5. Cyclostyle",
+          "hi": "निम्नलिखित शब्दों को शब्दकोश में आने वाले क्रम के अनुसार लिखें।<br>1. Cylinder<br>2. Cyclone<br>3. Cycle<br>4. Cymbal<br>5. Cyclostyle"
+        },
+        "options": [
+          {
+            "en": "32514",
+            "hi": ""
+          },
+          {
+            "en": "32541",
+            "hi": ""
+          },
+          {
+            "en": "45132",
+            "hi": ""
+          },
+          {
+            "en": "45123",
+            "hi": ""
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50019",
+        "question": {
+          "en": "Arrange the given words in the sequence in which they occur in the dictionary.<br>1. Violate<br>2. Vinegar<br>3. Violence<br>4. Violent<br>5. Violaceous",
+          "hi": "निम्नलिखित शब्दों को शब्दकोश में आने वाले क्रम के अनुसार लिखें।<br>1. Violate<br>2. Vinegar<br>3. Violence<br>4. Violent<br>5. Violaceous"
+        },
+        "options": [
+          {
+            "en": "25314",
+            "hi": ""
+          },
+          {
+            "en": "52134",
+            "hi": ""
+          },
+          {
+            "en": "52314",
+            "hi": ""
+          },
+          {
+            "en": "25134",
+            "hi": ""
+          }
+        ],
+        "answer": "4",
+        "solution": null
+      },
+      {
+        "id": "50020",
+        "question": {
+          "en": "In a certain code language, 'CENT' is coded as '168' and 'TAPE' is coded as '168'. How will 'PEACE' be coded in that code language?",
+          "hi": "एक विशिष्ट कोड भाषा में, 'CENT' को '168' लिखा जाता है तथा 'TAPE' को '168' लिखा जाता है। इस कोड भाषा में 'PEACE' को किस प्रकार लिखा जाएगा?"
+        },
+        "options": [
+          {
+            "en": "120",
+            "hi": ""
+          },
+          {
+            "en": "124",
+            "hi": ""
+          },
+          {
+            "en": "130",
+            "hi": ""
+          },
+          {
+            "en": "136",
+            "hi": ""
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      }
+    ],
+    "GK": [
+      {
+        "id": "50021",
+        "question": {
+          "en": "Which body recommends the distribution of taxes between Center and States?",
+          "hi": "निम्नलिखित में से कौन-सा निकाय केंद्र और राज्यों के बीच करों के वितरण की सिफारिश करता है?"
+        },
+        "options": [
+          {
+            "en": "Planning Commission",
+            "hi": "योजना आयोग"
+          },
+          {
+            "en": "Finance Commission",
+            "hi": "वित्त आयोग"
+          },
+          {
+            "en": "Parliament",
+            "hi": "संसद"
+          },
+          {
+            "en": "NITI Aayog",
+            "hi": "नीति आयोग"
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50022",
+        "question": {
+          "en": "Who appoints the chairman and members of the Finance Commission?",
+          "hi": "वित्त आयोग के अध्यक्ष एवं सदस्यों की नियुक्ति कौन करता है?"
+        },
+        "options": [
+          {
+            "en": "Parliament",
+            "hi": "संसद"
+          },
+          {
+            "en": "Union Cabinet",
+            "hi": "केंद्रीय मंत्रिमंडल"
+          },
+          {
+            "en": "President",
+            "hi": "राष्ट्रपति"
+          },
+          {
+            "en": "Prime Minister",
+            "hi": "प्रधानमंत्री"
+          }
+        ],
+        "answer": "3",
+        "solution": null
+      },
+      {
+        "id": "50023",
+        "question": {
+          "en": "During which festival is Gaur dance predominantly performed?",
+          "hi": "गौर नृत्य मुख्य रूप से किस त्यौहार के दौरान किया जाता है?"
+        },
+        "options": [
+          {
+            "en": "Diwali",
+            "hi": "दिवाली"
+          },
+          {
+            "en": "Holi",
+            "hi": "होली"
+          },
+          {
+            "en": "Navratri",
+            "hi": "नवरात्रि"
+          },
+          {
+            "en": "Baisakhi",
+            "hi": "बैसाखी"
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50024",
+        "question": {
+          "en": "Which Sikh scripture is recited during Hola Mohalla?",
+          "hi": "होला मोहल्ला के दौरान कौन सा सिख धर्मग्रंथ पढ़ा जाता है?"
+        },
+        "options": [
+          {
+            "en": "Guru Granth Sahib",
+            "hi": "गुरु ग्रंथ साहिब"
+          },
+          {
+            "en": "Bhagavad Gita",
+            "hi": "भगवद गीता"
+          },
+          {
+            "en": "Quran",
+            "hi": "कुरान"
+          },
+          {
+            "en": "Bible",
+            "hi": "बाइबल"
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50025",
+        "question": {
+          "en": "When is acceleration considered positive?",
+          "hi": "एक्सेलरेशन को कब पॉजिटिव माना जाता है?"
+        },
+        "options": [
+          {
+            "en": "When it is opposite to velocity",
+            "hi": "जब यह वेग के विपरीत हो"
+          },
+          {
+            "en": "When velocity is decreasing",
+            "hi": "जब वेग घट रहा हो"
+          },
+          {
+            "en": "When it is in the direction of velocity",
+            "hi": "जब यह वेग की दिशा में हो"
+          },
+          {
+            "en": "When the object is at rest",
+            "hi": "जब वस्तु विराम अवस्था में हो"
+          }
+        ],
+        "answer": "3",
+        "solution": null
+      },
+      {
+        "id": "50026",
+        "question": {
+          "en": "Frankenstein is written by ____.",
+          "hi": "फ्रेंकेस्टाइन ____ द्वारा लिखा गया है।"
+        },
+        "options": [
+          {
+            "en": "Mary Shelley",
+            "hi": "मैरी शेली"
+          },
+          {
+            "en": "Bram Stoker",
+            "hi": "ब्राम स्टोकर"
+          },
+          {
+            "en": "H.G. Wells",
+            "hi": "एच.जी. वेल्स"
+          },
+          {
+            "en": "Robert Louis Stevenson",
+            "hi": "रॉबर्ट लुइस स्टीवेंसन"
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50027",
+        "question": {
+          "en": "The Ease of Doing Business (EODB) indicator \"Enforcing Contracts\" measures:",
+          "hi": "व्यापार सुगमता (EODB) संकेतक \"अनुबंध प्रवर्तन\" क्या मापता है?"
+        },
+        "options": [
+          {
+            "en": "Implementation of labor regulations",
+            "hi": "श्रम विनियमों का कार्यान्वयन"
+          },
+          {
+            "en": "Ease of paying and managing taxes",
+            "hi": "करों का भुगतान और प्रबंधन में आसानी"
+          },
+          {
+            "en": "Efficiency of the judicial system in resolving commercial disputes",
+            "hi": "वाणिज्यिक विवादों को सुलझाने में न्यायिक प्रणाली की दक्षता"
+          },
+          {
+            "en": "Effectiveness of law enforcement agencies",
+            "hi": "कानून प्रवर्तन एजेंसियों की प्रभावशीलता"
+          }
+        ],
+        "answer": "3",
+        "solution": null
+      },
+      {
+        "id": "50028",
+        "question": {
+          "en": "In which city and year were the first World Athletics Championships held?",
+          "hi": "पहली विश्व एथलेटिक्स चैंपियनशिप किस शहर और वर्ष में आयोजित की गई थी?"
+        },
+        "options": [
+          {
+            "en": "Helsinki, 1983",
+            "hi": "हेलसिंकी, 1983"
+          },
+          {
+            "en": "Tokyo, 1991",
+            "hi": "टोक्यो, 1991"
+          },
+          {
+            "en": "Rome, 1987",
+            "hi": "रोम, 1987"
+          },
+          {
+            "en": "Berlin, 1993",
+            "hi": "बर्लिन, 1993"
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50029",
+        "question": {
+          "en": "If a spacecraft travels at 30 km/s, how long will it take to cover 1 AU (150 million km)?",
+          "hi": "यदि एक अंतरिक्ष यान 30 किमी/सेकंड की गति से यात्रा करता है, तो 1 AU (150 मिलियन किमी) की दूरी तय करने में कितना समय लगेगा?"
+        },
+        "options": [
+          {
+            "en": "15 days",
+            "hi": "15 दिन"
+          },
+          {
+            "en": "58 days",
+            "hi": "58 दिन"
+          },
+          {
+            "en": "100 days",
+            "hi": "100 दिन"
+          },
+          {
+            "en": "365 days",
+            "hi": "365 दिन"
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50030",
+        "question": {
+          "en": "In which year did India take over the BRICS Chairship from Russia?",
+          "hi": "भारत ने रूस से ब्रिक्स की अध्यक्षता किस वर्ष ग्रहण किया?"
+        },
+        "options": [
+          {
+            "en": "2020",
+            "hi": ""
+          },
+          {
+            "en": "2021",
+            "hi": ""
+          },
+          {
+            "en": "2022",
+            "hi": ""
+          },
+          {
+            "en": "2023",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50031",
+        "question": {
+          "en": "What was the main drawback of small-scale industry reservation policies?",
+          "hi": "लघु उद्योग आरक्षण नीतियों का मुख्य दोष क्या था?"
+        },
+        "options": [
+          {
+            "en": "They encouraged monopoly power",
+            "hi": "उन्होंने एकाधिकार शक्ति को प्रोत्साहित किया"
+          },
+          {
+            "en": "They eliminated export opportunities",
+            "hi": "उन्होंने निर्यात के अवसरों को समाप्त किया"
+          },
+          {
+            "en": "They excluded rural entrepreneurs",
+            "hi": "उन्होंने ग्रामीण उद्यमियों को बाहर रखा"
+          },
+          {
+            "en": "They restricted economies of scale and technological upgrading",
+            "hi": "उन्होंने पैमाने की अर्थव्यवस्थाओं और तकनीकी उन्नयन को प्रतिबंधित किया"
+          }
+        ],
+        "answer": "4",
+        "solution": null
+      },
+      {
+        "id": "50032",
+        "question": {
+          "en": "Which was the model for the First Five-Year Plan (1951-1956)?",
+          "hi": "प्रथम पंचवर्षीय योजना (1951-1956) का मॉडल कौन सा था?"
+        },
+        "options": [
+          {
+            "en": "Solow model",
+            "hi": "सोलो मॉडल"
+          },
+          {
+            "en": "Harrod-Domar model",
+            "hi": "हैरोड-डोमर मॉडल"
+          },
+          {
+            "en": "Keynesian model",
+            "hi": "कीनेसियन मॉडल"
+          },
+          {
+            "en": "Mahalanobis model",
+            "hi": "महालनोबिस मॉडल"
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50033",
+        "question": {
+          "en": "What is the length of a standard field hockey pitch?",
+          "hi": "एक मानक फील्ड हॉकी पिच की लंबाई कितनी होती है?"
+        },
+        "options": [
+          {
+            "en": "80 m",
+            "hi": ""
+          },
+          {
+            "en": "91.4 m",
+            "hi": ""
+          },
+          {
+            "en": "100 m",
+            "hi": ""
+          },
+          {
+            "en": "105 m",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50034",
+        "question": {
+          "en": "What is the goal of the Atal Mission for Rejuvenation and Urban Transformation (AMRUT) scheme launched in 2015?",
+          "hi": "वर्ष 2015 में शुरू की गई अटल कायाकल्प और शहरी परिवर्तन मिशन (AMRUT) योजना का लक्ष्य क्या है?"
+        },
+        "options": [
+          {
+            "en": "Promote digital services",
+            "hi": "डिजिटल सेवाओं को बढ़ावा देना"
+          },
+          {
+            "en": "Expand rural employment",
+            "hi": "ग्रामीण रोजगार का विस्तार करना"
+          },
+          {
+            "en": "Enhance agricultural marketing",
+            "hi": "कृषि विपणन को बढ़ाना"
+          },
+          {
+            "en": "Urban infrastructure and water supply",
+            "hi": "शहरी अवसंरचना और जल आपूर्ति"
+          }
+        ],
+        "answer": "4",
+        "solution": null
+      },
+      {
+        "id": "50035",
+        "question": {
+          "en": "Which financial institution plays the lead role in supporting India's export and import activities?",
+          "hi": "भारत की निर्यात और आयात गतिविधियों को समर्थन देने में कौन सी वित्तीय संस्था प्रमुख भूमिका निभाती है?"
+        },
+        "options": [
+          {
+            "en": "NABARD",
+            "hi": ""
+          },
+          {
+            "en": "EXIM Bank",
+            "hi": ""
+          },
+          {
+            "en": "World Bank",
+            "hi": ""
+          },
+          {
+            "en": "SIDBI",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50036",
+        "question": {
+          "en": "Who mentioned the role of the Banjaras in transporting grain in his memoirs?",
+          "hi": "किसने अपने संस्मरणों में अनाज परिवहन में बंजारों की भूमिका का उल्लेख किया था?"
+        },
+        "options": [
+          {
+            "en": "Babur",
+            "hi": "बाबर"
+          },
+          {
+            "en": "Humayun",
+            "hi": "हुमायूं"
+          },
+          {
+            "en": "Sher Shah Suri",
+            "hi": "शेर शाह सूरी"
+          },
+          {
+            "en": "Jahangir",
+            "hi": "जहाँगीर"
+          }
+        ],
+        "answer": "4",
+        "solution": null
+      },
+      {
+        "id": "50037",
+        "question": {
+          "en": "What term was used to describe the student stage of life in early Hindu philosophy?",
+          "hi": "प्रारंभिक हिंदू दर्शन में विद्यार्थी जीवन की अवस्था का वर्णन करने के लिए किस शब्द का प्रयोग किया जाता था?"
+        },
+        "options": [
+          {
+            "en": "Vanaprastha",
+            "hi": "वानप्रस्थ"
+          },
+          {
+            "en": "Brahmacharya",
+            "hi": "ब्रह्मचर्य"
+          },
+          {
+            "en": "Sannyasin",
+            "hi": "संन्यासी"
+          },
+          {
+            "en": "Grihastha",
+            "hi": "गृहस्थ"
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50038",
+        "question": {
+          "en": "As per a report by Prime Minister's Economic Advisory Panel EAC-PM, the number of domestic migrants have lowered by nearly ____ between 2011 and 2023.",
+          "hi": "प्रधानमंत्री के आर्थिक सलाहकार पैनल ई.ए.सी.-पी.एम. की एक रिपोर्ट के अनुसार, 2011 और 2023 के बीच घरेलू प्रवासियों की संख्या लगभग ____ कम हो गई है।"
+        },
+        "options": [
+          {
+            "en": "12%",
+            "hi": ""
+          },
+          {
+            "en": "9%",
+            "hi": ""
+          },
+          {
+            "en": "15%",
+            "hi": ""
+          },
+          {
+            "en": "21%",
+            "hi": ""
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50039",
+        "question": {
+          "en": "The PCPNDT Act was enacted by the Government of India in ____ for prohibition of sex selection.",
+          "hi": "लिंग चयन पर रोक लगाने के लिए भारत सरकार द्वारा पी.सी.पी.एन.डी.टी. अधिनियम ____ में अधिनियमित किया गया था।"
+        },
+        "options": [
+          {
+            "en": "1991",
+            "hi": ""
+          },
+          {
+            "en": "1994",
+            "hi": ""
+          },
+          {
+            "en": "2011",
+            "hi": ""
+          },
+          {
+            "en": "2015",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50040",
+        "question": {
+          "en": "To whom did the rebel soldiers of the Meerut Regiment want to hand over the rule of the country?",
+          "hi": "मेरठ रेजिमेंट के विद्रोही सैनिक देश का शासन किसे सौंपना चाहते थे?"
+        },
+        "options": [
+          {
+            "en": "Bahadur Shah Zafar",
+            "hi": "बहादुर शाह ज़फर"
+          },
+          {
+            "en": "Peshwa Baji Rao II",
+            "hi": "पेशवा बाजी राव II"
+          },
+          {
+            "en": "Nana Saheb",
+            "hi": "नाना साहब"
+          },
+          {
+            "en": "Rani Lakshmibai",
+            "hi": "रानी लक्ष्मीबाई"
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      }
+    ],
+    "MATH": [
+      {
+        "id": "50041",
+        "question": {
+          "en": "72 × 2 − 19 + (61 − 28) + 35 = ?",
+          "hi": "72 × 2 − 19 + (61 − 28) + 35 = ?"
+        },
+        "options": [
+          {
+            "en": "193",
+            "hi": ""
+          },
+          {
+            "en": "189",
+            "hi": ""
+          },
+          {
+            "en": "187",
+            "hi": ""
+          },
+          {
+            "en": "199",
+            "hi": ""
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50042",
+        "question": {
+          "en": "76 − 33 + 28 of 2 + 36 ÷ 3 − (22) + 19 = ?",
+          "hi": "76 − 33 + 28 of 2 + 36 ÷ 3 − (22) + 19 = ?"
+        },
+        "options": [
+          {
+            "en": "134",
+            "hi": ""
+          },
+          {
+            "en": "136",
+            "hi": ""
+          },
+          {
+            "en": "108",
+            "hi": ""
+          },
+          {
+            "en": "140",
+            "hi": ""
+          }
+        ],
+        "answer": "3",
+        "solution": null
+      },
+      {
+        "id": "50043",
+        "question": {
+          "en": "78 − 33 + 29 × 1 + 44 ÷ 4 + (17 of 2) − 19 = ?",
+          "hi": "78 − 33 + 29 × 1 + 44 ÷ 4 + (17 of 2) − 19 = ?"
+        },
+        "options": [
+          {
+            "en": "105",
+            "hi": ""
+          },
+          {
+            "en": "123",
+            "hi": ""
+          },
+          {
+            "en": "125",
+            "hi": ""
+          },
+          {
+            "en": "100",
+            "hi": ""
+          }
+        ],
+        "answer": "4",
+        "solution": null
+      },
+      {
+        "id": "50044",
+        "question": {
+          "en": "96 − 42 + 33 ÷ 3 + 21 of 2 + (18 − 14) = ?",
+          "hi": "96 − 42 + 33 ÷ 3 + 21 of 2 + (18 − 14) = ?"
+        },
+        "options": [
+          {
+            "en": "104",
+            "hi": ""
+          },
+          {
+            "en": "125",
+            "hi": ""
+          },
+          {
+            "en": "108",
+            "hi": ""
+          },
+          {
+            "en": "111",
+            "hi": ""
+          }
+        ],
+        "answer": "4",
+        "solution": null
+      },
+      {
+        "id": "50045",
+        "question": {
+          "en": "One angle of a parallelogram is 60 degrees. What is the value (in degrees) of its adjacent angle?",
+          "hi": "एक समानांतर चतुर्भुज का एक कोण 60 डिग्री है। इसके आसन्न कोण का मान (डिग्री में) क्या है?"
+        },
+        "options": [
+          {
+            "en": "110",
+            "hi": ""
+          },
+          {
+            "en": "120",
+            "hi": ""
+          },
+          {
+            "en": "80",
+            "hi": ""
+          },
+          {
+            "en": "130",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50046",
+        "question": {
+          "en": "Least Common Multiple of A and B is 15. Least Common Multiple of C and D is 25. What is the Least Common Multiple of A, B, C and D?",
+          "hi": "A तथा B का लघुत्तम समापवर्त्य 15 है। C तथा D का लघुत्तम समापवर्त्य 25 है। A, B, C तथा D का लघुत्तम समापवर्त्य क्या है?"
+        },
+        "options": [
+          {
+            "en": "150",
+            "hi": ""
+          },
+          {
+            "en": "125",
+            "hi": ""
+          },
+          {
+            "en": "75",
+            "hi": ""
+          },
+          {
+            "en": "50",
+            "hi": ""
+          }
+        ],
+        "answer": "3",
+        "solution": null
+      },
+      {
+        "id": "50047",
+        "question": {
+          "en": "Least Common Multiple of A and B is 30 and C = 18. What is the Least Common Multiple of A, B and C?",
+          "hi": "A तथा B का लघुत्तम समापवर्त्य 30 है तथा C = 18 है। A, B तथा C का लघुत्तम समापवर्त्य क्या है?"
+        },
+        "options": [
+          {
+            "en": "90",
+            "hi": ""
+          },
+          {
+            "en": "180",
+            "hi": ""
+          },
+          {
+            "en": "60",
+            "hi": ""
+          },
+          {
+            "en": "270",
+            "hi": ""
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50048",
+        "question": {
+          "en": "The Least Common Multiple of two numbers is 150. Which of the following can be the Highest Common Factor of the two numbers?",
+          "hi": "दो संख्याओं का लघुत्तम समापवर्त्य 150 है। निम्नलिखित में से कौन सा उन दो संख्याओं का महत्तम समापवर्तक हो सकता है?"
+        },
+        "options": [
+          {
+            "en": "15",
+            "hi": ""
+          },
+          {
+            "en": "20",
+            "hi": ""
+          },
+          {
+            "en": "35",
+            "hi": ""
+          },
+          {
+            "en": "28",
+            "hi": ""
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50049",
+        "question": {
+          "en": "An article is sold for a loss Rs. 81. Loss percentage is 18 percent. What is the selling price of the article?",
+          "hi": "एक वस्तु को 81 रुपये की हानि पर बेचा जाता है। हानि प्रतिशत 18 प्रतिशत है। वस्तु का विक्रय मूल्य क्या है?"
+        },
+        "options": [
+          {
+            "en": "Rs. 320",
+            "hi": ""
+          },
+          {
+            "en": "Rs. 324",
+            "hi": ""
+          },
+          {
+            "en": "Rs. 369",
+            "hi": ""
+          },
+          {
+            "en": "Rs. 330",
+            "hi": ""
+          }
+        ],
+        "answer": "3",
+        "solution": null
+      },
+      {
+        "id": "50050",
+        "question": {
+          "en": "Out of two numbers, 40 percent of the smaller number is equal to 20 percent of the larger number. If the sum of both the numbers is 750, then what is the value of the larger number?",
+          "hi": "दो संख्याओं में से, छोटी संख्या का 40 प्रतिशत बड़ी संख्या के 20 प्रतिशत के बराबर है। यदि दोनों संख्याओं का योग 750 है, तो बड़ी संख्या का मान क्या है?"
+        },
+        "options": [
+          {
+            "en": "450",
+            "hi": ""
+          },
+          {
+            "en": "500",
+            "hi": ""
+          },
+          {
+            "en": "550",
+            "hi": ""
+          },
+          {
+            "en": "600",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50051",
+        "question": {
+          "en": "A person sells an article at the loss of 25 percent. Cost price and selling price are increased by 40 percent and 'y' percent respectively. If the new loss percentage is 15 percent, then what is the value of 'y'?",
+          "hi": "एक व्यक्ति एक वस्तु को 25 प्रतिशत की हानि पर बेचता है। क्रय मूल्य तथा विक्रय मूल्य में क्रमशः 40 प्रतिशत तथा 'y' प्रतिशत की वृद्धि की जाती है। यदि नया हानि प्रतिशत 15 प्रतिशत है, तो 'y' का मान क्या है?"
+        },
+        "options": [
+          {
+            "en": "54.57",
+            "hi": ""
+          },
+          {
+            "en": "58.67",
+            "hi": ""
+          },
+          {
+            "en": "72.48",
+            "hi": ""
+          },
+          {
+            "en": "64.75",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50052",
+        "question": {
+          "en": "S alone can complete 3/4 part of a work in 18 days. R is 3 times as efficient as S. In how many days will R alone complete the same total work?",
+          "hi": "S अकेले किसी कार्य के 3/4 भाग को 18 दिनों में पूरा कर सकता है। R, S की तुलना में 3 गुना कार्यकुशल है। R अकेले उसी संपूर्ण कार्य को कितने दिनों में पूरा करेगा?"
+        },
+        "options": [
+          {
+            "en": "9",
+            "hi": ""
+          },
+          {
+            "en": "7",
+            "hi": ""
+          },
+          {
+            "en": "8",
+            "hi": ""
+          },
+          {
+            "en": "10",
+            "hi": ""
+          }
+        ],
+        "answer": "3",
+        "solution": null
+      },
+      {
+        "id": "50053",
+        "question": {
+          "en": "M and R together can do a work in 18 days. R and P together can do the same work in 24 days. P and M together can do the same work in 36 days. Working together, how much part of work can they do in 4 days?",
+          "hi": "M तथा R मिलकर एक कार्य को 18 दिनों में कर सकते हैं। R तथा P मिलकर उसी कार्य को 24 दिनों में कर सकते हैं। P तथा M मिलकर उसी कार्य को 36 दिनों में कर सकते हैं। एक साथ कार्य करते हुए, वे 4 दिनों में कार्य का कितना भाग पूरा कर सकते हैं?"
+        },
+        "options": [
+          {
+            "en": "1/4",
+            "hi": ""
+          },
+          {
+            "en": "1/3",
+            "hi": ""
+          },
+          {
+            "en": "1/2",
+            "hi": ""
+          },
+          {
+            "en": "1/6",
+            "hi": ""
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50054",
+        "question": {
+          "en": "Speed of a boat downstream and upstream is 42 km/hr and 36 km/hr respectively. What is the speed (in km/hr) of the boat in still water?",
+          "hi": "एक नाव की धारा के अनुकूल तथा धारा के प्रतिकूल गति क्रमशः 42 किमी./घंटा तथा 36 किमी./घंटा है। शांत जल में नाव की गति (किमी./घंटा में) क्या है?"
+        },
+        "options": [
+          {
+            "en": "31",
+            "hi": ""
+          },
+          {
+            "en": "39",
+            "hi": ""
+          },
+          {
+            "en": "42",
+            "hi": ""
+          },
+          {
+            "en": "35",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50055",
+        "question": {
+          "en": "The speed of a boat in still water is 23 km/hr. If the upstream speed of the boat is 17 km/hr, then what is the speed (in km/hr) of the stream?",
+          "hi": "शांत जल में एक नाव की गति 23 किमी./घंटा है। यदि धारा के प्रतिकूल नाव की गति 17 किमी./घंटा है, तो धारा की गति (किमी./घंटा में) क्या है?"
+        },
+        "options": [
+          {
+            "en": "7",
+            "hi": ""
+          },
+          {
+            "en": "6",
+            "hi": ""
+          },
+          {
+            "en": "4",
+            "hi": ""
+          },
+          {
+            "en": "5",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50056",
+        "question": {
+          "en": "The downstream speed of a boat is 35 km/hr. Speed of stream is 5 km/hr. What will be the total time (in hours) taken by the boat to cover 350 km downstream and 150 km upstream?",
+          "hi": "एक नाव की धारा के अनुकूल गति 35 किमी./घंटा है। धारा की गति 5 किमी./घंटा है। धारा के अनुकूल 350 किमी. तथा धारा के प्रतिकूल 150 किमी. दूरी तय करने में नाव द्वारा कुल कितना समय (घंटे में) लिया जायेगा?"
+        },
+        "options": [
+          {
+            "en": "12",
+            "hi": ""
+          },
+          {
+            "en": "16",
+            "hi": ""
+          },
+          {
+            "en": "18",
+            "hi": ""
+          },
+          {
+            "en": "20",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50057",
+        "question": {
+          "en": "The cost price of an article is Rs. 10000. It is sold at a profit of 40 percent. A discount of 30 percent was given. What is the marked price of the article?",
+          "hi": "एक वस्तु का क्रय मूल्य 10000 रुपये है। इसे 40 प्रतिशत के लाभ पर बेचा जाता है। 30 प्रतिशत की छूट दी गई थी। वस्तु का अंकित मूल्य क्या है?"
+        },
+        "options": [
+          {
+            "en": "Rs. 21000",
+            "hi": ""
+          },
+          {
+            "en": "Rs. 20000",
+            "hi": ""
+          },
+          {
+            "en": "Rs. 18000",
+            "hi": ""
+          },
+          {
+            "en": "Rs. 24000",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50058",
+        "question": {
+          "en": "Which of the following will have the highest marked price?",
+          "hi": "निम्नलिखित में से किस में अंकित मूल्य सबसे अधिकतम होगा?"
+        },
+        "options": [
+          {
+            "en": "Selling price = Rs. 4000 and Discount = 10 percent",
+            "hi": "विक्रय मूल्य = Rs. 4000 और छूट = 10 प्रतिशत"
+          },
+          {
+            "en": "Selling price = Rs. 5000 and Discount = 25 percent",
+            "hi": "विक्रय मूल्य = Rs. 5000 और छूट = 25 प्रतिशत"
+          },
+          {
+            "en": "Selling price = Rs. 6000 and Discount = 45 percent",
+            "hi": "विक्रय मूल्य = Rs. 6000 और छूट = 45 प्रतिशत"
+          },
+          {
+            "en": "Selling price = Rs. 6250 and Discount = 20 percent",
+            "hi": "विक्रय मूल्य = Rs. 6250 और छूट = 20 प्रतिशत"
+          }
+        ],
+        "answer": "3",
+        "solution": null
+      },
+      {
+        "id": "50059",
+        "question": {
+          "en": "After two successive discounts of 20 percent and 30 percent an article is sold for Rs. 4480. What is the marked price of the article?",
+          "hi": "20 प्रतिशत तथा 30 प्रतिशत की दो क्रमिक छूट के पश्चात एक वस्तु को 4480 रुपये में बेचा जाता है। उस वस्तु का अंकित मूल्य क्या है?"
+        },
+        "options": [
+          {
+            "en": "Rs. 11000",
+            "hi": ""
+          },
+          {
+            "en": "Rs. 8000",
+            "hi": ""
+          },
+          {
+            "en": "Rs. 12000",
+            "hi": ""
+          },
+          {
+            "en": "Rs. 15000",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50060",
+        "question": {
+          "en": "A 1.8 meter tall boy casts a shadow 1.2 meter. At the same time a building casts a shadow 8 metre long. What is the height of the building?",
+          "hi": "एक 1.8 मीटर लंबे लड़के की परछाई 1.2 मीटर है। उसी समय पर एक बिल्डिंग की परछाई 8 मीटर लंबी है। बिल्डिंग की ऊंचाई कितनी है?"
+        },
+        "options": [
+          {
+            "en": "12 meter",
+            "hi": "12 मीटर"
+          },
+          {
+            "en": "14 meter",
+            "hi": "14 मीटर"
+          },
+          {
+            "en": "10 meter",
+            "hi": "10 मीटर"
+          },
+          {
+            "en": "18 meter",
+            "hi": "18 मीटर"
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      }
+    ],
+    "HINDI": [
+      {
+        "id": "50061",
+        "question": {
+          "en": "निम्न में से **शुद्ध** शब्द कौन-सा है?",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "पिंजरा",
+            "hi": ""
+          },
+          {
+            "en": "पींजरा",
+            "hi": ""
+          },
+          {
+            "en": "पिंजडा",
+            "hi": ""
+          },
+          {
+            "en": "पिंजड़ा",
+            "hi": ""
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50062",
+        "question": {
+          "en": "निम्न में से **शुद्ध** शब्द कौन-सा है?",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "पीडा",
+            "hi": ""
+          },
+          {
+            "en": "पीड़ा",
+            "hi": ""
+          },
+          {
+            "en": "पीरा",
+            "hi": ""
+          },
+          {
+            "en": "पिरा",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50063",
+        "question": {
+          "en": "निम्नलिखित में वाक्य के **शुद्ध** रूप का चयन करें:",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "अपना हस्ताक्षर लगा दो",
+            "hi": ""
+          },
+          {
+            "en": "अपना हस्ताक्षर कर दो",
+            "hi": ""
+          },
+          {
+            "en": "अपनी हस्ताक्षर लगा दो",
+            "hi": ""
+          },
+          {
+            "en": "अपनी हस्ताक्षर लगवा दो",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50064",
+        "question": {
+          "en": "'दोषसिद्धि' का उपयुक्त अंग्रेज़ी पारिभाषिक शब्द है:",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "Conviction",
+            "hi": ""
+          },
+          {
+            "en": "Judgment",
+            "hi": ""
+          },
+          {
+            "en": "Sentence",
+            "hi": ""
+          },
+          {
+            "en": "Verdict",
+            "hi": ""
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50065",
+        "question": {
+          "en": "किसी कार्यालय में आने-जाने वालों का रिकॉर्ड कहाँ दर्ज होता है?",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "रिपोर्ट फाइल",
+            "hi": ""
+          },
+          {
+            "en": "आगंतुक रजिस्टर",
+            "hi": ""
+          },
+          {
+            "en": "उपस्थिति पुस्तिका",
+            "hi": ""
+          },
+          {
+            "en": "सूचना बोर्ड",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50066",
+        "question": {
+          "en": "सुरक्षा कर्मी द्वारा उपयोग की जाने वाली आधिकारिक डायरी को क्या कहते हैं?",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "नोटबुक",
+            "hi": ""
+          },
+          {
+            "en": "रजिस्टर",
+            "hi": ""
+          },
+          {
+            "en": "ड्यूटी डायरी",
+            "hi": ""
+          },
+          {
+            "en": "टिप्पणी पुस्तिका",
+            "hi": ""
+          }
+        ],
+        "answer": "3",
+        "solution": null
+      },
+      {
+        "id": "50067",
+        "question": {
+          "en": "वरिष्ठ अधिकारी द्वारा दिए गए निर्देश को क्या कहते हैं?",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "विनती",
+            "hi": ""
+          },
+          {
+            "en": "आदेश",
+            "hi": ""
+          },
+          {
+            "en": "रिपोर्ट",
+            "hi": ""
+          },
+          {
+            "en": "नियुक्ति",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50068",
+        "question": {
+          "en": "जब पुलिस बिना वर्दी के काम करती है, तो वह क्या कहलाती है?",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "गुप्तचर सेवा",
+            "hi": ""
+          },
+          {
+            "en": "तैनाती",
+            "hi": ""
+          },
+          {
+            "en": "सतर्कता",
+            "hi": ""
+          },
+          {
+            "en": "संयुक्त जांच",
+            "hi": ""
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50069",
+        "question": {
+          "en": "\"हाजिरी रजिस्टर\" का प्रयोग किसलिए होता है?",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "परीक्षा के लिए",
+            "hi": ""
+          },
+          {
+            "en": "उपस्थिति दर्ज करने के लिए",
+            "hi": ""
+          },
+          {
+            "en": "वेतन देने के लिए",
+            "hi": ""
+          },
+          {
+            "en": "सामान लाने के लिए",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50070",
+        "question": {
+          "en": "\"सामूहिक आदेश\" किस स्थिति में दिया जाता है?",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "व्यक्तिगत वार्ता में",
+            "hi": ""
+          },
+          {
+            "en": "सभी को एक साथ निर्देश देने के लिए",
+            "hi": ""
+          },
+          {
+            "en": "संगीत कार्यक्रम में",
+            "hi": ""
+          },
+          {
+            "en": "कविता पाठ में",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50071",
+        "question": {
+          "en": "\"ऑपरेशनल रिपोर्ट\" किससे संबंधित होती है?",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "किसी कार्यवाही या मिशन की विस्तृत जानकारी से",
+            "hi": ""
+          },
+          {
+            "en": "परीक्षा परिणाम से",
+            "hi": ""
+          },
+          {
+            "en": "मेडिकल रिपोर्ट से",
+            "hi": ""
+          },
+          {
+            "en": "विज्ञापन से",
+            "hi": ""
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50072",
+        "question": {
+          "en": "\"संदेहास्पद व्यवहार\" को कैसे पहचाना जाता है?",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "शांत रहने से",
+            "hi": ""
+          },
+          {
+            "en": "भोजन करने से",
+            "hi": ""
+          },
+          {
+            "en": "असामान्य गतिविधि और हाव-भाव से",
+            "hi": ""
+          },
+          {
+            "en": "पढ़ाई करने से",
+            "hi": ""
+          }
+        ],
+        "answer": "3",
+        "solution": null
+      },
+      {
+        "id": "50073",
+        "question": {
+          "en": "'दंडात्मक' शब्द का सही अर्थ क्या है?",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "सज़ा से संबंधित",
+            "hi": ""
+          },
+          {
+            "en": "गैरकानूनी तरीके से ज़मीन लेना",
+            "hi": ""
+          },
+          {
+            "en": "जिस पर अपराध का आरोप है",
+            "hi": ""
+          },
+          {
+            "en": "मनमुटाव या झगड़ा",
+            "hi": ""
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50074",
+        "question": {
+          "en": "**आंतरिक सुरक्षा व्यवस्था में संसाधन प्रबंधन एक रणनीतिक कार्य माना जाता है। सीमित संसाधनों का सही वितरण तभी संभव है जब प्राथमिकताओं की स्पष्ट पहचान हो। गलत प्राथमिकता निर्धारण से सुरक्षा तंत्र की कार्यक्षमता प्रभावित हो सकती है।**<br><br>संसाधन प्रबंधन को किस रूप में प्रस्तुत किया गया है?",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "रणनीतिक कार्य",
+            "hi": ""
+          },
+          {
+            "en": "तकनीकी प्रक्रिया",
+            "hi": ""
+          },
+          {
+            "en": "औपचारिक व्यवस्था",
+            "hi": ""
+          },
+          {
+            "en": "प्रशासनिक बाधा",
+            "hi": ""
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50075",
+        "question": {
+          "en": "**आंतरिक सुरक्षा व्यवस्था में संसाधन प्रबंधन एक रणनीतिक कार्य माना जाता है। सीमित संसाधनों का सही वितरण तभी संभव है जब प्राथमिकताओं की स्पष्ट पहचान हो। गलत प्राथमिकता निर्धारण से सुरक्षा तंत्र की कार्यक्षमता प्रभावित हो सकती है।**<br><br>सीमित संसाधनों का सही वितरण किस पर निर्भर करता है?",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "कानून पर",
+            "hi": ""
+          },
+          {
+            "en": "प्राथमिकताओं की स्पष्ट पहचान पर",
+            "hi": ""
+          },
+          {
+            "en": "तकनीक पर",
+            "hi": ""
+          },
+          {
+            "en": "प्रशिक्षण पर",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      },
+      {
+        "id": "50076",
+        "question": {
+          "en": "**आंतरिक सुरक्षा व्यवस्था में संसाधन प्रबंधन एक रणनीतिक कार्य माना जाता है। सीमित संसाधनों का सही वितरण तभी संभव है जब प्राथमिकताओं की स्पष्ट पहचान हो। गलत प्राथमिकता निर्धारण से सुरक्षा तंत्र की कार्यक्षमता प्रभावित हो सकती है।**<br><br>गलत प्राथमिकता निर्धारण से क्या प्रभावित होता है?",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "प्रशासनिक ढाँचा",
+            "hi": ""
+          },
+          {
+            "en": "सामाजिक व्यवस्था",
+            "hi": ""
+          },
+          {
+            "en": "सुरक्षा तंत्र की कार्यक्षमता",
+            "hi": ""
+          },
+          {
+            "en": "न्यायिक प्रक्रिया",
+            "hi": ""
+          }
+        ],
+        "answer": "3",
+        "solution": null
+      },
+      {
+        "id": "50077",
+        "question": {
+          "en": "**आंतरिक सुरक्षा व्यवस्था में संसाधन प्रबंधन एक रणनीतिक कार्य माना जाता है। सीमित संसाधनों का सही वितरण तभी संभव है जब प्राथमिकताओं की स्पष्ट पहचान हो। गलत प्राथमिकता निर्धारण से सुरक्षा तंत्र की कार्यक्षमता प्रभावित हो सकती है।**<br><br>गद्यांश के अनुसार संसाधनों की प्रकृति कैसी है?",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "असीमित",
+            "hi": ""
+          },
+          {
+            "en": "प्रचुर",
+            "hi": ""
+          },
+          {
+            "en": "अनियंत्रित",
+            "hi": ""
+          },
+          {
+            "en": "सीमित",
+            "hi": ""
+          }
+        ],
+        "answer": "4",
+        "solution": null
+      },
+      {
+        "id": "50078",
+        "question": {
+          "en": "**आंतरिक सुरक्षा व्यवस्था में संसाधन प्रबंधन एक रणनीतिक कार्य माना जाता है। सीमित संसाधनों का सही वितरण तभी संभव है जब प्राथमिकताओं की स्पष्ट पहचान हो। गलत प्राथमिकता निर्धारण से सुरक्षा तंत्र की कार्यक्षमता प्रभावित हो सकती है।**<br><br>यह गद्यांश किस सोच को दर्शाता है?",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "रणनीतिक संसाधन-आधारित सोच",
+            "hi": ""
+          },
+          {
+            "en": "दंड आधारित सोच",
+            "hi": ""
+          },
+          {
+            "en": "प्रतिक्रियात्मक सोच",
+            "hi": ""
+          },
+          {
+            "en": "केंद्रीकृत सोच",
+            "hi": ""
+          }
+        ],
+        "answer": "1",
+        "solution": null
+      },
+      {
+        "id": "50079",
+        "question": {
+          "en": "सरकारी रिकॉर्ड सुरक्षित रखने की जगह को क्या कहा जाता है?",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "दस्तावेज़ कक्ष",
+            "hi": ""
+          },
+          {
+            "en": "फाइल कक्ष",
+            "hi": ""
+          },
+          {
+            "en": "अभिलेख गृह",
+            "hi": ""
+          },
+          {
+            "en": "रजिस्टर कक्ष",
+            "hi": ""
+          }
+        ],
+        "answer": "3",
+        "solution": null
+      },
+      {
+        "id": "50080",
+        "question": {
+          "en": "देश में उच्च पद पर आसीन लोगों के लिए कई बार \"Escort Duty\" लगाई जाती है। इस शब्द का **सही** हिंदी तकनीकी शब्द क्या है?",
+          "hi": ""
+        },
+        "options": [
+          {
+            "en": "निगरानी",
+            "hi": ""
+          },
+          {
+            "en": "सुरक्षा एस्कॉर्ट",
+            "hi": ""
+          },
+          {
+            "en": "रखरखाव",
+            "hi": ""
+          },
+          {
+            "en": "छापा मारना",
+            "hi": ""
+          }
+        ],
+        "answer": "2",
+        "solution": null
+      }
+    ]
+  }
+}
