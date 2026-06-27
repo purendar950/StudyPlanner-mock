@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="css/style.css">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase-config.js?v=4"></script>
+<script src="js/supabase-config.js?v=5"></script>
 <style>
   .container { max-width: 1000px; padding-top: 1.2rem; padding-bottom: 4rem; }
   .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:1.2rem; margin-bottom:1.2rem; }
@@ -137,26 +137,24 @@
     </div>
   </div>
 
-  <!-- SCREEN 3: ONE EXAM (folders + add test + tests) -->
+  <!-- SCREEN 3: ONE EXAM (folders drill-in + add test + tests) -->
   <div class="screen" id="screen-exam" style="display:none;">
     <div class="card">
-      <h3>📁 Folders / Tabs (any depth)</h3>
-      <div class="hint">Nested tabs like PYQ Mock → Tier I → 2025 → Sectionals → Reasoning. Add under "(top level)" or another folder.</div>
-      <div id="folder-tree"><div class="empty">—</div></div>
+      <h3>📁 Folders</h3>
+      <div class="hint">Click <b>Open ▸</b> to go inside a folder, then add subfolders/tests there. Use the breadcrumb to go back up.</div>
+      <div id="folder-crumb" class="muted" style="margin-bottom:10px;"></div>
+      <div id="folder-list"><div class="empty">—</div></div>
       <div class="row" style="margin-top:10px;">
-        <select id="folder-parent" style="min-width:200px;"></select>
-        <input type="text" id="folder-name" placeholder="Folder name (e.g. Tier I)" style="flex:1;min-width:160px;">
-        <button class="btn btn-green btn-sm" onclick="addFolder()">Add folder</button>
+        <input type="text" id="folder-name" placeholder="New folder name (e.g. 2025)" style="flex:1;min-width:160px;">
+        <button class="btn btn-green btn-sm" onclick="addFolder()">Add folder here</button>
       </div>
     </div>
 
     <div class="card">
-      <h3>⬆️ Add a Test</h3>
-      <div class="hint">Pick the folder, set Free/Paid, then upload the question JSON.</div>
-      <div class="grid2">
-        <div><label class="lbl">Put inside folder</label><select id="test-folder" style="width:100%;"></select></div>
-        <div><label class="lbl">Access</label><select id="test-free" style="width:100%;"><option value="free">FREE</option><option value="paid">PAID</option></select></div>
-      </div>
+      <h3>⬆️ Add a Test here</h3>
+      <div class="hint">Adds into: <b id="addtest-loc">(exam root)</b> · set Free/Paid, then upload the question JSON.</div>
+      <div class="row"><label class="lbl" style="margin:0 8px 0 0;">Access</label>
+        <select id="test-free"><option value="free">FREE</option><option value="paid">PAID</option></select></div>
       <div class="row" style="margin-top:10px;">
         <input type="file" id="mock-file" accept="application/json,.json" onchange="adminParseFile(this)">
         <button class="btn" onclick="adminTogglePaste()">📋 Paste JSON instead</button>
@@ -167,7 +165,7 @@
 
     <div class="card">
       <div class="row" style="justify-content:space-between;">
-        <h3 style="margin:0;">📝 Tests in this exam</h3>
+        <h3 style="margin:0;">📝 Tests in this folder</h3>
         <button class="btn btn-sm" onclick="adminRefreshTests()">↻ Refresh</button>
       </div>
       <div id="mock-tests-list" style="margin-top:10px;"><div class="empty">—</div></div>
@@ -193,6 +191,6 @@
   }
   if (!localStorage.getItem('mmh_theme')) document.documentElement.setAttribute('data-theme', 'dark');
 </script>
-<script src="js/admin.js?v=4"></script>
+<script src="js/admin.js?v=5"></script>
 </body>
 </html>

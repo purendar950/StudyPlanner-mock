@@ -1,6 +1,6 @@
 /* StudyPlanner Mock — admin (Supabase). Tree builder: categories → exams → folders → tests. */
 
-var ADMIN = { user:null, cats:[], catId:null, exams:[], examId:null, folders:[], parsed:null, editCat:null, editExam:null, busy:false };
+var ADMIN = { user:null, cats:[], catId:null, exams:[], examId:null, folders:[], fpath:[], allTests:[], parsed:null, editCat:null, editExam:null, busy:false };
 
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function escA(s){ return String(s==null?'':s).replace(/'/g,"\\'").replace(/"/g,'&quot;'); }
@@ -140,54 +140,76 @@ async function saveExam(){
 async function deleteExam(id){ if(!confirm('Delete exam "'+id+'" and all its folders/tests?'))return;
   try{ await MockAPI.deleteExam(id); if(ADMIN.examId===id) ADMIN.examId=null; toast('🗑 Deleted'); loadExams(); resetFolderArea(); }catch(e){ toast('Failed: '+(e.message||e)); } }
 
-function selectExam(id){ ADMIN.examId=id; renderExams(); var e=ADMIN.exams.find(function(x){return x.id===id;}); setTitle(e?e.name:'Exam'); showScreen('exam'); loadFolders(); adminRefreshTests(); }
+function selectExam(id){ ADMIN.examId=id; renderExams(); var e=ADMIN.exams.find(function(x){return x.id===id;}); setTitle(e?e.name:'Exam'); showScreen('exam'); loadFolders(); }
 
-/* ── ③ Folders ── */
-function resetFolderArea(){
-  var ids=['folder-tree','folder-parent','test-folder','mock-tests-list'];
-  ids.forEach(function(i){ var el=document.getElementById(i); if(el) el.innerHTML=''; });
-}
-async function loadFolders(){
-  try { ADMIN.folders = await MockAPI.listFolders(ADMIN.examId); } catch(e){ ADMIN.folders=[]; toast('Load failed: '+(e.message||e)); }
-  renderFolderTree(); populateFolderSelects();
-}
+/* ── ③ Folders (drill-in navigator) ── */
+function resetFolderArea(){ ['folder-list','folder-crumb','mock-tests-list'].forEach(function(i){ var el=document.getElementById(i); if(el) el.innerHTML=''; }); }
 function childrenOf(pid){ return ADMIN.folders.filter(function(f){ return (f.parent_id||null)===(pid||null); }); }
-function renderFolderTree(){
-  var box=document.getElementById('folder-tree');
-  if(!ADMIN.folders.length){ box.innerHTML='<div class="empty">No folders yet — tests can sit directly in the exam, or add folders below.</div>'; return; }
-  function rec(pid, depth){
-    return childrenOf(pid).map(function(f){
-      return '<div class="frow" style="padding-left:'+(8+depth*18)+'px;">'+
-        '<div>'+(depth?'↳ ':'📁 ')+esc(f.name)+'</div>'+
-        '<div class="row"><button class="btn btn-sm" onclick="renameFolder(\''+f.id+'\')">✏️</button>'+
-        '<button class="btn btn-red btn-sm" onclick="deleteFolder(\''+f.id+'\')">🗑</button></div></div>'+
-        rec(f.id, depth+1);
-    }).join('');
+function curFolderId(){ return (ADMIN.fpath && ADMIN.fpath.length) ? ADMIN.fpath[ADMIN.fpath.length-1] : null; }
+function folderById(id){ return ADMIN.folders.find(function(f){return f.id===id;}); }
+function folderPath(f){ var parts=[f.name]; var p=f.parent_id; var g=0; while(p&&g<20){ var pf=folderById(p); if(!pf)break; parts.unshift(pf.name); p=pf.parent_id; g++; } return parts.join(' / '); }
+
+async function loadFolders(){
+  ADMIN.fpath = [];
+  try { ADMIN.folders = await MockAPI.listFolders(ADMIN.examId); } catch(e){ ADMIN.folders=[]; toast('Load failed: '+(e.message||e)); }
+  try { ADMIN.allTests = await MockAPI.listAllTests(ADMIN.examId); } catch(e){ ADMIN.allTests=[]; }
+  renderFolders();
+}
+function renderFolders(){
+  var ex=ADMIN.exams.find(function(x){return x.id===ADMIN.examId;});
+  var crumb='<a href="#" onclick="folderCrumb(-1);return false;" style="color:var(--accent);">🏠 '+esc(ex?ex.name:'Exam')+'</a>';
+  (ADMIN.fpath||[]).forEach(function(id,idx){ var f=folderById(id); crumb+=' / <a href="#" onclick="folderCrumb('+idx+');return false;" style="color:var(--accent);">'+esc(f?f.name:'?')+'</a>'; });
+  var cEl=document.getElementById('folder-crumb'); if(cEl) cEl.innerHTML='📂 '+crumb;
+
+  var kids=childrenOf(curFolderId());
+  var box=document.getElementById('folder-list');
+  if(box){
+    if(!kids.length){ box.innerHTML='<div class="empty">No subfolders here. Add one below, or add tests into this level.</div>'; }
+    else { box.innerHTML = kids.map(function(f){
+      var n=childrenOf(f.id).length;
+      return '<div class="item"><div><div class="t">📁 '+esc(f.name)+'</div><div class="s">'+n+' subfolder'+(n===1?'':'s')+'</div></div>'+
+        '<div class="row"><button class="btn btn-sm" onclick="folderOpen(\''+f.id+'\')">Open ▸</button>'+
+        '<button class="btn btn-sm" onclick="renameFolder(\''+f.id+'\')">✏️</button>'+
+        '<button class="btn btn-red btn-sm" onclick="deleteFolder(\''+f.id+'\')">🗑</button></div></div>';
+    }).join(''); }
   }
-  box.innerHTML = rec(null, 0);
+  var loc=document.getElementById('addtest-loc');
+  if(loc){ var path=(ADMIN.fpath||[]).map(function(id){var f=folderById(id);return f?f.name:'';}).join(' / '); loc.textContent = path||'(exam root)'; }
+  renderTestsHere();
 }
-function folderPath(f){ var parts=[f.name]; var p=f.parent_id; var guard=0;
-  while(p && guard<20){ var pf=ADMIN.folders.find(function(x){return x.id===p;}); if(!pf)break; parts.unshift(pf.name); p=pf.parent_id; guard++; } return parts.join(' / '); }
-function populateFolderSelects(){
-  var opts='<option value="">(top level)</option>'+ADMIN.folders.map(function(f){ return '<option value="'+f.id+'">'+esc(folderPath(f))+'</option>'; }).join('');
-  document.getElementById('folder-parent').innerHTML=opts;
-  document.getElementById('test-folder').innerHTML='<option value="">(exam root — no folder)</option>'+
-    ADMIN.folders.map(function(f){ return '<option value="'+f.id+'">'+esc(folderPath(f))+'</option>'; }).join('');
-}
+function folderOpen(id){ (ADMIN.fpath=ADMIN.fpath||[]).push(id); renderFolders(); }
+function folderCrumb(idx){ ADMIN.fpath = idx<0 ? [] : ADMIN.fpath.slice(0, idx+1); renderFolders(); }
+
 async function addFolder(){
-  if(!ADMIN.examId){ toast('Select an exam first.'); return; }
+  if(!ADMIN.examId){ toast('Open an exam first.'); return; }
   var name=(document.getElementById('folder-name').value||'').trim();
   if(!name){ toast('Folder name required.'); return; }
-  var parent=document.getElementById('folder-parent').value||null;
-  try { await MockAPI.createFolder({ exam_id:ADMIN.examId, parent_id:parent, name:name, order_index:childrenOf(parent).length });
-    document.getElementById('folder-name').value=''; toast('✅ Folder added'); loadFolders(); }
+  try { await MockAPI.createFolder({ exam_id:ADMIN.examId, parent_id:curFolderId(), name:name, order_index:childrenOf(curFolderId()).length });
+    document.getElementById('folder-name').value='';
+    ADMIN.folders = await MockAPI.listFolders(ADMIN.examId);
+    toast('✅ Folder added'); renderFolders(); }
   catch(e){ toast('Failed: '+(e.message||e)); }
 }
-async function renameFolder(id){ var f=ADMIN.folders.find(function(x){return x.id===id;}); if(!f)return;
-  var name=prompt('Rename folder:', f.name); if(!name)return;
-  try{ await MockAPI.renameFolder(id,name.trim()); toast('✅ Renamed'); loadFolders(); }catch(e){ toast('Failed: '+(e.message||e)); } }
-async function deleteFolder(id){ if(!confirm('Delete this folder and its subfolders? Tests inside will move to the exam root.'))return;
-  try{ await MockAPI.deleteFolder(id); toast('🗑 Deleted'); loadFolders(); adminRefreshTests(); }catch(e){ toast('Failed: '+(e.message||e)); } }
+async function renameFolder(id){ var f=folderById(id); if(!f)return; var name=prompt('Rename folder:', f.name); if(!name)return;
+  try{ await MockAPI.renameFolder(id,name.trim()); ADMIN.folders=await MockAPI.listFolders(ADMIN.examId); toast('✅ Renamed'); renderFolders(); }catch(e){ toast('Failed: '+(e.message||e)); } }
+async function deleteFolder(id){ if(!confirm('Delete this folder and its subfolders?'))return;
+  try{ await MockAPI.deleteFolder(id); ADMIN.fpath=(ADMIN.fpath||[]).filter(function(x){return x!==id;});
+    ADMIN.folders=await MockAPI.listFolders(ADMIN.examId); ADMIN.allTests=await MockAPI.listAllTests(ADMIN.examId);
+    toast('🗑 Deleted'); renderFolders(); }catch(e){ toast('Failed: '+(e.message||e)); } }
+
+function renderTestsHere(){
+  var box=document.getElementById('mock-tests-list'); if(!box) return;
+  var here=(ADMIN.allTests||[]).filter(function(t){ return (t.folder_id||null)===curFolderId(); });
+  if(!here.length){ box.innerHTML='<div class="empty">No tests in this folder. Add one above.</div>'; return; }
+  box.innerHTML = here.map(function(t){
+    var url='test-engine.html?id='+encodeURIComponent(t.id);
+    return '<div class="item"><div style="flex:1;min-width:200px;">'+
+      '<div class="t">'+esc(t.title||t.id)+' '+(t.is_free===false?'<span class="badge badge-paid">PAID</span>':'<span class="badge badge-free">FREE</span>')+(t.is_published?'':' <span class="badge badge-amber">Draft</span>')+'</div>'+
+      '<div class="s">'+(t.total_questions||0)+' Qs · '+(t.total_sections||0)+' sections · ▶ <a href="'+url+'" target="_blank" style="color:var(--accent);">open</a></div></div>'+
+      '<div class="row"><button class="btn btn-sm" onclick="adminTogglePublish(\''+escA(t.id)+'\','+(!t.is_published)+')">'+(t.is_published?'👁 Unpublish':'🚀 Publish')+'</button>'+
+      '<button class="btn btn-red btn-sm" onclick="adminDeleteTest(\''+escA(t.id)+'\')">🗑</button></div></div>';
+  }).join('');
+}
 
 /* ── ④ Upload test ── */
 function adminTogglePaste(){ var ta=document.getElementById('mock-json-text'); if(ta) ta.style.display = ta.style.display==='none'?'block':'none'; }
@@ -238,7 +260,7 @@ async function adminUpload(){
   try{
     var p=ADMIN.parsed;
     p.test.exam_id=ADMIN.examId;
-    p.test.folder_id=document.getElementById('test-folder').value||null;
+    p.test.folder_id=curFolderId();
     p.test.is_free=document.getElementById('test-free').value!=='paid';
     var r=await MockAPI.uploadTest(p);
     toast('✅ Uploaded '+r.questionCount+' questions.');
@@ -249,23 +271,11 @@ async function adminUpload(){
   finally{ ADMIN.busy=false; }
 }
 
-/* ── ⑤ Tests list ── */
+/* ── ⑤ Tests list (current folder) ── */
 async function adminRefreshTests(){
-  var box=document.getElementById('mock-tests-list'); if(!box) return;
-  if(!ADMIN.examId){ box.innerHTML='<div class="empty">Select an exam above.</div>'; return; }
-  var tests;
-  try{ tests=await MockAPI.listAllTests(ADMIN.examId); }catch(e){ box.innerHTML='<div class="empty">Load failed: '+esc(e.message||e)+'</div>'; return; }
-  if(!tests.length){ box.innerHTML='<div class="empty">No tests in this exam yet. Add one above.</div>'; return; }
-  box.innerHTML = tests.map(function(t){
-    var fpath = t.folder_id ? (ADMIN.folders.find(function(f){return f.id===t.folder_id;})||{}) : null;
-    var loc = fpath && fpath.name ? folderPath(fpath) : '(exam root)';
-    var url='test-engine.html?id='+encodeURIComponent(t.id);
-    return '<div class="item"><div style="flex:1;min-width:200px;">'+
-      '<div class="t">'+esc(t.title||t.id)+' '+(t.is_free===false?'<span class="badge badge-paid">PAID</span>':'<span class="badge badge-free">FREE</span>')+(t.is_published?'':' <span class="badge badge-amber">Draft</span>')+'</div>'+
-      '<div class="s">📁 '+esc(loc)+' · '+(t.total_questions||0)+' Qs · '+(t.total_sections||0)+' sections · ▶ <a href="'+url+'" target="_blank" style="color:var(--accent);">open</a></div></div>'+
-      '<div class="row"><button class="btn btn-sm" onclick="adminTogglePublish(\''+escA(t.id)+'\','+(!t.is_published)+')">'+(t.is_published?'👁 Unpublish':'🚀 Publish')+'</button>'+
-      '<button class="btn btn-red btn-sm" onclick="adminDeleteTest(\''+escA(t.id)+'\')">🗑</button></div></div>';
-  }).join('');
+  if(!ADMIN.examId) return;
+  try{ ADMIN.allTests = await MockAPI.listAllTests(ADMIN.examId); }catch(e){ ADMIN.allTests=[]; }
+  renderTestsHere();
 }
 async function adminTogglePublish(id,val){ try{ await MockAPI.setPublished(id,val); toast('✅ Updated'); adminRefreshTests(); }catch(e){ toast('Failed: '+(e.message||e)); } }
 async function adminDeleteTest(id){ if(!confirm('Delete test "'+id+'"?'))return; try{ await MockAPI.deleteTest(id); toast('🗑 Deleted'); adminRefreshTests(); }catch(e){ toast('Failed: '+(e.message||e)); } }
