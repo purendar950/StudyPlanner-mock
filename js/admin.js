@@ -256,26 +256,71 @@ function adminTryParse(raw){
 function adminNormalize(obj){
   var errors=[],warnings=[];
   if(!obj||typeof obj!=='object') return {ok:false,errors:['Root must be a JSON object.'],warnings:[]};
-  var test=obj.test||{};
-  if(!test.title){ test.title=test.id||'Untitled Mock'; warnings.push('No test.title — using "'+test.title+'".'); }
-  if(!test.id){ test.id=String(test.title).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||('mock-'+Date.now()); warnings.push('No test.id — generated "'+test.id+'".'); }
+
+  // ── Test config: accept obj.test OR obj.meta ──
+  var test = obj.test ? Object.assign({}, obj.test) : {};
+  var timer = null;
+  if(obj.meta && !obj.test){
+    var m=obj.meta;
+    test.title = m.title;
+    if(m.correct_score!=null)  test.correct_score = m.correct_score;
+    if(m.negative_score!=null) test.negative_score = m.negative_score;
+    if(m.timer_minutes!=null)  timer = Number(m.timer_minutes);
+    if(m.id) test.id = m.id;
+  }
+  if(!test.title){ test.title=test.id||'Untitled Mock'; warnings.push('No title — using "'+test.title+'".'); }
+  if(!test.id){ test.id=String(test.title).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||('mock-'+Date.now()); warnings.push('No id — generated "'+test.id+'".'); }
   test.correct_score=(test.correct_score!=null)?Number(test.correct_score):2;
   test.negative_score=(test.negative_score!=null)?Number(test.negative_score):0.5;
-  test.section_time_min=(test.section_time_min!=null)?Number(test.section_time_min):15;
   test.is_published=test.is_published!==false;
+
+  // ── Sections: accept array | object-keyed-by-name | flat questions ──
   var sections=[];
-  if(Array.isArray(obj.sections)){ sections=obj.sections.map(function(s,i){ return {name:s.name||('Section '+(i+1)),time_min:s.time_min||null,questions:Array.isArray(s.questions)?s.questions:[]}; }); }
-  else if(Array.isArray(obj.questions)){ var by={}; obj.questions.forEach(function(q){ var t=q.topic||q.section||'Section 1'; (by[t]=by[t]||[]).push(q); }); sections=Object.keys(by).map(function(n){ return {name:n,time_min:null,questions:by[n]}; }); }
-  else errors.push('Provide "sections": [{name, questions:[...]}] OR "questions": [...].');
+  if(Array.isArray(obj.sections)){
+    sections=obj.sections.map(function(s,i){ return {name:s.name||('Section '+(i+1)),time_min:s.time_min||null,questions:Array.isArray(s.questions)?s.questions:[]}; });
+  } else if(obj.sections && typeof obj.sections==='object'){
+    sections=Object.keys(obj.sections).map(function(k){ return {name:k,time_min:null,questions:Array.isArray(obj.sections[k])?obj.sections[k]:[]}; });
+  } else if(Array.isArray(obj.questions)){
+    var by={}; obj.questions.forEach(function(q){ var t=q.topic||q.section||'Section 1'; (by[t]=by[t]||[]).push(q); });
+    sections=Object.keys(by).map(function(n){ return {name:n,time_min:null,questions:by[n]}; });
+  } else errors.push('Provide "sections" (array or object) OR "questions": [...].');
+
+  // ── Per-section time: from test.section_time_min, else split total timer across sections ──
+  if(test.section_time_min!=null){ test.section_time_min=Number(test.section_time_min); }
+  else if(timer && sections.length){ test.section_time_min=Math.max(1,Math.round(timer/sections.length)); }
+  else { test.section_time_min=15; }
+  sections.forEach(function(s){ if(!s.time_min) s.time_min=test.section_time_min; });
+
+  // ── Normalize every question to the engine shape ──
+  sections.forEach(function(sec){ sec.questions=(sec.questions||[]).map(normalizeQuestion); });
+
+  // ── Validate ──
   var total=0;
   sections.forEach(function(sec){ if(!sec.questions.length) warnings.push('Section "'+sec.name+'" has no questions.');
     sec.questions.forEach(function(q,qi){ total++; var oc=0; for(var n=1;n<=5;n++) if(q['option_'+n]!=null&&q['option_'+n]!=='') oc++;
-      if(oc<2) errors.push('Q'+(qi+1)+' in "'+sec.name+'": needs option_1 and option_2.');
+      if(oc<2) errors.push('Q'+(qi+1)+' in "'+sec.name+'": needs at least 2 options.');
       if(q.answer==null||q.answer==='') errors.push('Q'+(qi+1)+' in "'+sec.name+'": missing "answer".');
       if(q.question==null||q.question==='') errors.push('Q'+(qi+1)+' in "'+sec.name+'": missing "question".'); }); });
   if(sections.length&&total===0) errors.push('No questions found.');
   if(errors.length) return {ok:false,errors:errors,warnings:warnings};
   return {ok:true,errors:[],warnings:warnings,test:test,sections:sections};
+}
+
+/* Convert one question of any supported shape to the engine shape:
+   options[] → option_1..N ; solution → explanation ; answer letter → number. */
+function normalizeQuestion(q){
+  q = Object.assign({}, q);
+  if(Array.isArray(q.options)){
+    q.options.forEach(function(opt,i){ if(q['option_'+(i+1)]==null) q['option_'+(i+1)]=opt; });
+    delete q.options;
+  }
+  if((q.explanation==null||q.explanation==='') && q.solution!=null) q.explanation=q.solution;
+  if(q.answer!=null){
+    var a=String(q.answer).trim();
+    if(/^[A-Ea-e]$/.test(a)) q.answer=String('abcde'.indexOf(a.toLowerCase())+1); // A/B/C/D → 1/2/3/4
+    else q.answer=a;
+  }
+  return q;
 }
 async function adminUpload(){
   if(!ADMIN.parsed){ toast('Nothing to upload.'); return; }
