@@ -340,6 +340,62 @@ async function adminUpload(){
   finally{ ADMIN.busy=false; }
 }
 
+/* ── Bulk import: folder of JSON mocks → auto-create subfolders + upload all, with error report ── */
+async function bulkImport(input){
+  if(!ADMIN.examId){ toast('Open an exam first.'); return; }
+  var files = Array.prototype.slice.call(input.files||[]).filter(function(f){ return /\.json$/i.test(f.name); });
+  var report=document.getElementById('bulk-report');
+  if(!files.length){ if(report) report.innerHTML='<div class="empty">No .json files found in the selection.</div>'; return; }
+  if(report) report.innerHTML='<div class="muted">⏳ Processing '+files.length+' file(s)…</div>';
+  var markFree = !document.getElementById('bulk-free') || document.getElementById('bulk-free').checked;
+
+  try { ADMIN.folders = await MockAPI.listFolders(ADMIN.examId); } catch(e){}
+  var local = ADMIN.folders.slice();
+  function findChild(parentId,name){ return local.find(function(f){ return (f.parent_id||null)===(parentId||null) && f.name.toLowerCase()===String(name).toLowerCase(); }); }
+  async function ensurePath(segs){
+    var parent=curFolderId();
+    for(var i=0;i<segs.length;i++){
+      var nm=(segs[i]||'').trim(); if(!nm) continue;
+      var ex=findChild(parent,nm);
+      if(ex){ parent=ex.id; }
+      else { var created=await MockAPI.createFolder({ exam_id:ADMIN.examId, parent_id:parent, name:nm, order_index:0 }); local.push(created); parent=created.id; }
+    }
+    return parent;
+  }
+
+  var ok=[], fail=[];
+  for(var i=0;i<files.length;i++){
+    var f=files[i];
+    try{
+      var text=await f.text();
+      var obj; try{ obj=JSON.parse(text); }catch(pe){ throw new Error('Invalid JSON'); }
+      var res=adminNormalize(obj);
+      if(!res.ok) throw new Error(res.errors[0] + (res.errors.length>1?(' (+'+(res.errors.length-1)+' more)'):''));
+      var rel=f.webkitRelativePath||'';
+      var segs=[];
+      if(rel){ var parts=rel.split('/'); parts.pop(); if(parts.length>1) segs=parts.slice(1); }
+      var folderId=await ensurePath(segs);
+      var hasId = (obj.test && obj.test.id) || (obj.meta && obj.meta.id);
+      if(!hasId) res.test.id = slug(f.name.replace(/\.json$/i,'')) || res.test.id;
+      res.test.exam_id=ADMIN.examId; res.test.folder_id=folderId; res.test.is_free=markFree;
+      await MockAPI.uploadTest(res);
+      var q=res.sections.reduce(function(a,s){return a+s.questions.length;},0);
+      ok.push({ name:f.name, title:res.test.title, q:q, path:segs.join(' / ') });
+    }catch(e){ fail.push({ name:f.name, err:(e.message||String(e)) }); }
+  }
+
+  try { ADMIN.folders=await MockAPI.listFolders(ADMIN.examId); ADMIN.allTests=await MockAPI.listAllTests(ADMIN.examId); }catch(e){}
+  renderFolders();
+
+  var html='<div style="font-weight:700;margin-bottom:8px;">Imported '+ok.length+' / '+files.length+(fail.length?(' · <span style="color:var(--red);">'+fail.length+' failed</span>'):'')+'</div>';
+  if(ok.length) html += ok.map(function(o){ return '<div class="muted">✅ '+esc(o.name)+' → <b>'+esc(o.title)+'</b> ('+o.q+' Qs)'+(o.path?' · 📁 '+esc(o.path):'')+'</div>'; }).join('');
+  if(fail.length) html += '<div style="color:var(--red);font-weight:700;margin-top:10px;">Errors — fix these and re-import:</div>'+
+    fail.map(function(fl){ return '<div style="color:var(--red);">❌ '+esc(fl.name)+' — '+esc(fl.err)+'</div>'; }).join('');
+  if(report) report.innerHTML=html;
+  toast('✅ '+ok.length+' uploaded'+(fail.length?(' · ❌ '+fail.length+' failed'):''));
+  try{ input.value=''; }catch(e){}
+}
+
 /* ── ⑤ Tests list (current folder) ── */
 async function adminRefreshTests(){
   if(!ADMIN.examId) return;
