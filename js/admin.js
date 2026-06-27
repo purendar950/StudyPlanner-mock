@@ -324,6 +324,7 @@ function adminNormalize(obj){
       if(oc<2) errors.push('Q'+(qi+1)+' in "'+sec.name+'": needs at least 2 options.');
       if(q.answer==null||q.answer==='') errors.push('Q'+(qi+1)+' in "'+sec.name+'": missing "answer".');
       if(q.question==null||q.question==='') errors.push('Q'+(qi+1)+' in "'+sec.name+'": missing "question".'); }); });
+  if(obj.total!=null && Number(obj.total)!==total) warnings.push('Declared total '+obj.total+' does not match parsed questions '+total+'.');
   if(sections.length&&total===0) errors.push('No questions found.');
   if(errors.length) return {ok:false,errors:errors,warnings:warnings};
   return {ok:true,errors:[],warnings:warnings,test:test,sections:sections};
@@ -346,8 +347,9 @@ function normalizeQuestion(q){
 
   var optionVals=[];
   for(var n=1;n<=5;n++) if(q['option_'+n]!=null && q['option_'+n]!=='') optionVals.push(String(q['option_'+n]).trim());
+  var compactText=function(v){ return String(v==null?'':v).replace(/\s+/g,' ').trim(); };
 
-  // Answer resolution. Supported: answer (1-based number, A/B/C/D, or exact option text) | correct (0-based index) | answer_index (0-based)
+  // Answer resolution. Supported: answer (1-based number, A/B/C/D, exact option text, or whitespace-normalized option text) | correct (0-based index) | answer_index (0-based)
   if((q.answer==null||q.answer==='')){
     if(q.correct!=null){
       if(/^\d+$/.test(String(q.correct))) q.answer=String(Number(q.correct)+1);   // correct is 0-based
@@ -361,6 +363,10 @@ function normalizeQuestion(q){
     if(/^[A-Ea-e]$/.test(a)) q.answer=String('abcde'.indexOf(a.toLowerCase())+1);   // A/B/C/D → 1/2/3/4
     else {
       var exactIndex=optionVals.findIndex(function(opt){ return opt===a; });
+      if(exactIndex<0){
+        var ca=compactText(a);
+        exactIndex=optionVals.findIndex(function(opt){ return compactText(opt)===ca; });
+      }
       if(exactIndex>=0) q.answer=String(exactIndex+1);
       else q.answer=a;
     }
