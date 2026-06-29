@@ -244,14 +244,25 @@ function renderTestsHere(){
   var here=(ADMIN.allTests||[]).filter(function(t){ return (t.folder_id||null)===curFolderId(); });
   if(!here.length){ box.innerHTML='<div class="empty">No tests in this folder. Add one above.</div>'; return; }
   box.innerHTML = here.map(function(t){
-    var url='test-engine.html?id='+encodeURIComponent(t.id);
+    var url=adminLiveTestUrl(t.id);
     return '<div class="item"><div style="flex:1;min-width:200px;">'+
       '<div class="t">'+esc(t.title||t.id)+' '+(t.is_free===false?'<span class="badge badge-paid">PAID</span>':'<span class="badge badge-free">FREE</span>')+(t.is_published?'':' <span class="badge badge-amber">Draft</span>')+'</div>'+
-      '<div class="s">'+(t.total_questions||0)+' Qs · '+(t.total_sections||0)+' sections · ▶ <a href="'+url+'" target="_blank" style="color:var(--accent);">open</a></div></div>'+
-      '<div class="row"><button class="btn btn-sm" onclick="openEditor(\''+escA(t.id)+'\')">✏️ Edit</button>'+
+      '<div class="s">'+(t.total_questions||0)+' Qs · '+(t.total_sections||0)+' sections · ▶ <a href="'+url+'" target="_blank" style="color:var(--accent);">live link</a></div></div>'+
+      '<div class="row"><button class="btn btn-sm" onclick="adminCopyTestLink(\''+escA(t.id)+'\')">🔗 Copy Link</button><button class="btn btn-sm" onclick="openEditor(\''+escA(t.id)+'\')">✏️ Edit</button>'+
       '<button class="btn btn-sm" onclick="adminTogglePublish(\''+escA(t.id)+'\','+(!t.is_published)+')">'+(t.is_published?'👁 Unpublish':'🚀 Publish')+'</button>'+
       '<button class="btn btn-red btn-sm" onclick="adminDeleteTest(\''+escA(t.id)+'\')">🗑</button></div></div>';
   }).join('');
+}
+function adminLiveTestUrl(id){
+  var base = window.location.href.replace(/admin\.html.*$/,'').replace(/[#?].*$/,'');
+  if(base && base.charAt(base.length-1)!=='/') base += '/';
+  return base + 'index.html?test=' + encodeURIComponent(id);
+}
+function adminCopyTestLink(id){
+  var url=adminLiveTestUrl(id);
+  function done(){ toast('🔗 Live test link copied'); }
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Copy live test link:', url); }); }
+  else prompt('Copy live test link:', url);
 }
 
 /* ── ④ Upload test ── */

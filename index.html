@@ -252,6 +252,15 @@
   var SB = window._supabase || null;
   var CURRENT_USER = null, ATTEMPTED = {}, pendingTestId = null;
   var shellBootUserId = null, shellBootPromise = null;
+  function getLaunchTestId(){
+    try{ var p=new URLSearchParams(window.location.search); return p.get('test') || p.get('mock') || p.get('id') || sessionStorage.getItem('sp_pending_test') || ''; }
+    catch(e){ return ''; }
+  }
+  function setPendingTest(id){ pendingTestId=id||null; try{ if(id) sessionStorage.setItem('sp_pending_test',id); else sessionStorage.removeItem('sp_pending_test'); }catch(e){} }
+  function consumePendingTest(){ var id=pendingTestId || getLaunchTestId(); setPendingTest(null); return id; }
+  function cleanLaunchUrl(){
+    try{ var u=new URL(window.location.href); ['test','mock','id'].forEach(function(k){ u.searchParams.delete(k); }); window.history.replaceState({},'',u.pathname+(u.searchParams.toString()?('?'+u.searchParams.toString()):'')+u.hash); }catch(e){}
+  }
 
   /* ── Session ── */
   function userName(u){ return (u&&u.user_metadata&&u.user_metadata.full_name)||(u&&u.email)||'Student'; }
@@ -292,20 +301,20 @@
     if(!email||!pass){ m.className='msg err'; m.textContent='Enter email and password.'; return; }
     try{ var r=await SB.auth.signInWithPassword({email:email,password:pass}); if(r.error) throw r.error;
       CURRENT_USER=r.data.user; syncIdentity(); renderAcct(); closeAuth(); await renderShell();
-      if(pendingTestId){ var id=pendingTestId; pendingTestId=null; startTest(id); } }
+      var id=consumePendingTest(); if(id){ cleanLaunchUrl(); startTest(id); } }
     catch(e){ m.className='msg err'; m.textContent=e.message||'Login failed.'; } }
   async function doSignup(){ var m=document.getElementById('su-msg'); m.className='msg'; m.textContent='Creating account…';
     var name=(document.getElementById('su-name').value||'').trim(), email=(document.getElementById('su-email').value||'').trim(), pass=document.getElementById('su-pass').value||'';
     if(!name||!email||!pass){ m.className='msg err'; m.textContent='Fill all fields.'; return; }
     if(pass.length<6){ m.className='msg err'; m.textContent='Password must be at least 6 characters.'; return; }
     try{ var r=await SB.auth.signUp({email:email,password:pass,options:{data:{full_name:name}}}); if(r.error) throw r.error;
-      if(r.data.session){ CURRENT_USER=r.data.user; syncIdentity(); renderAcct(); closeAuth(); await renderShell(); if(pendingTestId){ var id=pendingTestId; pendingTestId=null; startTest(id);} }
-      else { m.className='msg ok'; m.textContent='Account created! Check your email to confirm, then sign in.'; authTab('login'); } }
+      if(r.data.session){ CURRENT_USER=r.data.user; syncIdentity(); renderAcct(); closeAuth(); await renderShell(); var id=consumePendingTest(); if(id){ cleanLaunchUrl(); startTest(id);} }
+      else { m.className='msg ok'; m.textContent='Account created! Check your email to confirm, then sign in. After sign-in your test will open automatically.'; authTab('login'); } }
     catch(e){ m.className='msg err'; m.textContent=e.message||'Sign up failed.'; } }
   async function doGoogle(){
     if(!SB){ alert('Not connected.'); return; }
     try{
-      var url = window.location.origin + window.location.pathname;
+      var url = window.location.origin + window.location.pathname + window.location.search;
       var r = await SB.auth.signInWithOAuth({ provider:'google', options:{ redirectTo:url } });
       if(r.error) throw r.error;
     }catch(e){ alert('Google sign-in failed: ' + (e.message||e)); }
@@ -446,7 +455,7 @@
   function onExamSearch(v){ cur().q = v; render(); }
 
   function openTest(id, mode){
-    if(!CURRENT_USER){ pendingTestId=id; openAuth('login'); return; }
+    if(!CURRENT_USER){ setPendingTest(id); openAuth('signup'); return; }
     syncIdentity();
     window.location.href = 'test-engine.html?id='+encodeURIComponent(id)+(mode?'&mode='+mode:'');
   }
@@ -473,7 +482,15 @@
   }
 
   // Boot
-  (async function(){ await refreshSession(); })();
+  (async function(){
+    var launchId=getLaunchTestId();
+    if(launchId) setPendingTest(launchId);
+    await refreshSession();
+    if(launchId){
+      if(CURRENT_USER){ var id=consumePendingTest(); cleanLaunchUrl(); startTest(id); }
+      else openAuth('signup');
+    }
+  })();
 </script>
 </body>
 </html>
