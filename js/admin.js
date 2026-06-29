@@ -248,7 +248,7 @@ function renderTestsHere(){
     return '<div class="item"><div style="flex:1;min-width:200px;">'+
       '<div class="t">'+esc(t.title||t.id)+' '+(t.is_free===false?'<span class="badge badge-paid">PAID</span>':'<span class="badge badge-free">FREE</span>')+(t.is_published?'':' <span class="badge badge-amber">Draft</span>')+'</div>'+
       '<div class="s">'+(t.total_questions||0)+' Qs · '+(t.total_sections||0)+' sections · ▶ <a href="'+url+'" target="_blank" style="color:var(--accent);">live link</a></div></div>'+
-      '<div class="row"><button class="btn btn-sm" onclick="adminCopyTestLink(\''+escA(t.id)+'\')">🔗 Copy Link</button><button class="btn btn-sm" onclick="openEditor(\''+escA(t.id)+'\')">✏️ Edit</button>'+
+      '<div class="row"><button class="btn btn-sm" onclick="adminAttemptTest(\''+escA(t.id)+'\')">📝 Attempt Mock</button><button class="btn btn-sm" onclick="adminCopyTestLink(\''+escA(t.id)+'\')">🔗 Copy Link</button><button class="btn btn-sm" onclick="openEditor(\''+escA(t.id)+'\')">✏️ Edit</button>'+
       '<button class="btn btn-sm" onclick="adminTogglePublish(\''+escA(t.id)+'\','+(!t.is_published)+')">'+(t.is_published?'👁 Unpublish':'🚀 Publish')+'</button>'+
       '<button class="btn btn-red btn-sm" onclick="adminDeleteTest(\''+escA(t.id)+'\')">🗑</button></div></div>';
   }).join('');
@@ -263,6 +263,9 @@ function adminCopyTestLink(id){
   function done(){ toast('🔗 Live test link copied'); }
   if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Copy live test link:', url); }); }
   else prompt('Copy live test link:', url);
+}
+function adminAttemptTest(id){
+  window.open(adminLiveTestUrl(id), '_blank', 'noopener');
 }
 
 /* ── ④ Upload test ── */
