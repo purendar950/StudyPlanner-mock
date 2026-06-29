@@ -10,7 +10,7 @@ function slug(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').
 /* ── Screen navigation (Categories ▸ Exams ▸ Exam) ── */
 function showScreen(name){
   ADMIN.screen = name;
-  ['categories','exams','exam','editor'].forEach(function(s){ var el=document.getElementById('screen-'+s); if(el) el.style.display = (s===name)?'block':'none'; });
+  ['categories','exams','exam','editor','users'].forEach(function(s){ var el=document.getElementById('screen-'+s); if(el) el.style.display = (s===name)?'block':'none'; });
   var back=document.getElementById('adm-back'); if(back) back.style.display = (name==='categories')?'none':'block';
   window.scrollTo({ top:0, behavior:'smooth' });
   saveAdminNav();
@@ -32,6 +32,7 @@ async function adminRestoreNav(){
 function setTitle(t){ var el=document.getElementById('adm-title'); if(el) el.textContent=t; }
 function catName(){ var c=ADMIN.cats.find(function(x){return x.id===ADMIN.catId;}); return c?c.name:'Exams'; }
 function admBack(){
+  if(ADMIN.screen==='users'){ showScreen('categories'); setTitle('Exam Categories'); return; }
   if(ADMIN.screen==='editor'){ var ex0=ADMIN.exams.find(function(x){return x.id===ADMIN.examId;}); setTitle(ex0?ex0.name:'Exam'); showScreen('exam'); return; }
   if(ADMIN.screen==='exam'){
     // step up one folder level first, if we're inside folders
@@ -266,6 +267,34 @@ function adminCopyTestLink(id){
 }
 function adminAttemptTest(id){
   window.open(adminLiveTestUrl(id), '_blank', 'noopener');
+}
+
+/* ── Users / attempts ── */
+function fmtDate(v){ try{ return v ? new Date(v).toLocaleString() : '-'; }catch(e){ return v||'-'; } }
+function fmtTime(sec){ sec=Number(sec||0); var m=Math.floor(sec/60), s=sec%60; return m+'m '+s+'s'; }
+function adminShowUsers(){ setTitle('Users'); showScreen('users'); adminLoadUsers(); }
+async function adminLoadUsers(){
+  var box=document.getElementById('admin-users-list'); if(!box) return;
+  box.innerHTML='<div class="muted">⏳ Loading users…</div>';
+  try{
+    var users=await MockAPI.adminListUsers();
+    if(!users.length){ box.innerHTML='<div class="empty">No user attempts found yet.</div>'; return; }
+    box.innerHTML=users.map(function(u,idx){
+      var attempts=(u.attempts||[]).map(function(a){
+        var secs=''; try{ secs=(a.section_breakdown||[]).map(function(s){ return '<span class="badge">'+esc(s.name||'Section')+': '+esc(s.score||0)+'/'+esc(s.maxScore||s.max_score||'-')+'</span>'; }).join(' '); }catch(e){}
+        return '<div class="item" style="align-items:flex-start;"><div style="flex:1;">'+
+          '<div class="t">'+esc(a.test_title||a.test_id)+' <span class="muted">('+esc(a.test_id)+')</span></div>'+
+          '<div class="s">Score: <b>'+esc(a.score)+'</b> / '+esc(a.max_score)+' · '+esc(a.percentage)+'% · Attempted '+esc(a.attempted)+'/'+esc(a.total_questions)+' · ✅ '+esc(a.correct)+' · ❌ '+esc(a.wrong)+' · ⏱ '+fmtTime(a.time_taken)+' · '+fmtDate(a.submitted_at)+'</div>'+
+          (secs?'<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;">'+secs+'</div>':'')+
+        '</div></div>';
+      }).join('');
+      return '<details class="item" '+(idx===0?'open':'')+' style="display:block;">'+
+        '<summary style="cursor:pointer;list-style:none;"><div class="row" style="justify-content:space-between;gap:10px;align-items:flex-start;">'+
+          '<div><div class="t">'+esc(u.user_name||'User')+'</div><div class="s">ID: '+esc(u.user_id)+'</div></div>'+
+          '<div class="s" style="text-align:right;">Attempts: <b>'+u.total_attempts+'</b><br>Best: <b>'+esc(u.best_percentage||0)+'%</b> · Avg: <b>'+esc(u.avg_percentage||0)+'%</b><br>Last: '+fmtDate(u.last_attempt_at)+'</div>'+
+        '</div></summary><div style="margin-top:10px;">'+attempts+'</div></details>';
+    }).join('');
+  }catch(e){ box.innerHTML='<div class="empty" style="color:var(--red);">Failed to load users: '+esc(e.message||e)+'</div>'; }
 }
 
 /* ── ④ Upload test ── */

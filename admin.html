@@ -87,7 +87,24 @@
   <div class="appbar">
     <button class="back" id="adm-back" onclick="admBack()" style="display:none;">←</button>
     <h2 id="adm-title">Exam Categories</h2>
-    <div class="muted" style="white-space:nowrap;"><span id="who"></span> · <a href="#" onclick="adminSignOut();return false;" style="color:var(--accent);">Sign out</a></div>
+    <div class="row" style="gap:8px;align-items:center;">
+      <button class="btn btn-sm" onclick="adminShowUsers()">👥 Users</button>
+      <div class="muted" style="white-space:nowrap;"><span id="who"></span> · <a href="#" onclick="adminSignOut();return false;" style="color:var(--accent);">Sign out</a></div>
+    </div>
+  </div>
+
+  <!-- SCREEN: USERS -->
+  <div class="screen" id="screen-users" style="display:none;">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;align-items:center;gap:10px;">
+        <div>
+          <h3>👥 Users</h3>
+          <div class="hint">Users are listed from saved mock attempts. Includes user id/name, attempt count, scores, timing, and section breakdown.</div>
+        </div>
+        <button class="btn btn-sm" onclick="adminLoadUsers()">↻ Refresh</button>
+      </div>
+      <div id="admin-users-list" style="margin-top:12px;"><div class="empty">Click refresh to load users.</div></div>
+    </div>
   </div>
 
   <!-- SCREEN 1: CATEGORIES -->

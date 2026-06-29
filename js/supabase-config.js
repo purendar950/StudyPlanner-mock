@@ -105,6 +105,33 @@ window.SUPABASE_CONFIG = Object.freeze({
       return res.data || [];
     },
 
+    async adminListUsers() {
+      var c = requireClient();
+      var ar = await c.from("mock_attempts").select("*").order("submitted_at", { ascending: false });
+      if (ar.error) throw ar.error;
+      var tr = await c.from("mock_tests").select("id,title");
+      if (tr.error) throw tr.error;
+      var titleById = {};
+      (tr.data || []).forEach(function(t){ titleById[t.id] = t.title || t.id; });
+      var users = {};
+      (ar.data || []).forEach(function(a){
+        var uid = a.user_id || "guest";
+        if(!users[uid]) users[uid] = { user_id:uid, user_name:a.user_name || "Guest", attempts:[], total_attempts:0, best_percentage:null, avg_percentage:0, total_time:0, last_attempt_at:null };
+        var u = users[uid];
+        if(a.user_name && a.user_name !== "Guest") u.user_name = a.user_name;
+        a.test_title = titleById[a.test_id] || a.test_id;
+        u.attempts.push(a);
+        u.total_attempts++;
+        var pct = Number(a.percentage || 0);
+        u.avg_percentage += pct;
+        if(u.best_percentage == null || pct > u.best_percentage) u.best_percentage = pct;
+        u.total_time += Number(a.time_taken || 0);
+        if(!u.last_attempt_at || new Date(a.submitted_at) > new Date(u.last_attempt_at)) u.last_attempt_at = a.submitted_at;
+      });
+      return Object.keys(users).map(function(k){ var u=users[k]; u.avg_percentage = u.total_attempts ? Number((u.avg_percentage/u.total_attempts).toFixed(2)) : 0; return u; })
+        .sort(function(a,b){ return new Date(b.last_attempt_at||0) - new Date(a.last_attempt_at||0); });
+    },
+
     /* ── Admin auth ── */
     async signIn(email, password) {
       var c = requireClient();
