@@ -308,7 +308,7 @@ function adminNormalize(obj){
   var errors=[],warnings=[];
   if(!obj||typeof obj!=='object') return {ok:false,errors:['Root must be a JSON object.'],warnings:[]};
 
-  // ── Test config: accept obj.test OR obj.meta (+ top-level title/quiz_id) ──
+  // ── Test config: accept obj.test OR obj.meta (+ top-level title/quiz_id/series_id) ──
   var test = obj.test ? Object.assign({}, obj.test) : {};
   var timer = null;
   if(!obj.test){
@@ -548,10 +548,13 @@ async function bulkImport(input){
     var f=files[i];
     try{
       var text=await f.text();
-      var obj; try{ obj=JSON.parse(text); }catch(pe){ throw new Error('Invalid JSON'); }
+      var parsed=adminParseJsonLenient(text);
+      if(!parsed.ok) throw new Error('Invalid JSON: '+(parsed.error.message||parsed.error));
+      var obj=parsed.obj;
       var res=adminNormalize(obj);
+      if(parsed.trailing) res.warnings.push('Ignored trailing text after JSON.');
       if(!res.ok) throw new Error(res.errors[0] + (res.errors.length>1?(' (+'+(res.errors.length-1)+' more)'):''));
-      var hasId = (obj.test && obj.test.id) || (obj.meta && obj.meta.id);
+      var hasId = (obj.test && obj.test.id) || (obj.meta && obj.meta.id) || obj.quiz_id || obj.series_id || obj.id;
       if(!hasId) res.test.id = slug(f.name.replace(/\.json$/i,'')) || res.test.id;
       res.test.exam_id=ADMIN.examId; res.test.folder_id=folderId; res.test.is_free=markFree;
       await MockAPI.uploadTest(res);
