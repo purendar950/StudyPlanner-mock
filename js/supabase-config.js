@@ -108,6 +108,9 @@ window.SUPABASE_CONFIG = Object.freeze({
     async adminListUsers() {
       var c = requireClient();
       var ar = await c.from("mock_attempts").select("user_id,user_name,user_email,submitted_at").order("submitted_at", { ascending: false });
+      if (ar.error && String(ar.error.message || ar.error).indexOf("user_email") >= 0) {
+        ar = await c.from("mock_attempts").select("user_id,user_name,submitted_at").order("submitted_at", { ascending: false });
+      }
       if (ar.error) throw ar.error;
       var users = {};
       (ar.data || []).forEach(function(a){
