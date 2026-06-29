@@ -269,7 +269,7 @@ function adminAttemptTest(id){
   window.open(adminLiveTestUrl(id), '_blank', 'noopener');
 }
 
-/* ── Users / attempts ── */
+/* ── Users ── */
 function fmtDate(v){ try{ return v ? new Date(v).toLocaleString() : '-'; }catch(e){ return v||'-'; } }
 function fmtTime(sec){ sec=Number(sec||0); var m=Math.floor(sec/60), s=sec%60; return m+'m '+s+'s'; }
 function adminShowUsers(){ setTitle('Users'); showScreen('users'); adminLoadUsers(); }
@@ -278,21 +278,21 @@ async function adminLoadUsers(){
   box.innerHTML='<div class="muted">⏳ Loading users…</div>';
   try{
     var users=await MockAPI.adminListUsers();
-    if(!users.length){ box.innerHTML='<div class="empty">No user attempts found yet.</div>'; return; }
-    box.innerHTML=users.map(function(u,idx){
-      var attempts=(u.attempts||[]).map(function(a){
-        var secs=''; try{ secs=(a.section_breakdown||[]).map(function(s){ return '<span class="badge">'+esc(s.name||'Section')+': '+esc(s.score||0)+'/'+esc(s.maxScore||s.max_score||'-')+'</span>'; }).join(' '); }catch(e){}
-        return '<div class="item" style="align-items:flex-start;"><div style="flex:1;">'+
-          '<div class="t">'+esc(a.test_title||a.test_id)+' <span class="muted">('+esc(a.test_id)+')</span></div>'+
-          '<div class="s">Score: <b>'+esc(a.score)+'</b> / '+esc(a.max_score)+' · '+esc(a.percentage)+'% · Attempted '+esc(a.attempted)+'/'+esc(a.total_questions)+' · ✅ '+esc(a.correct)+' · ❌ '+esc(a.wrong)+' · ⏱ '+fmtTime(a.time_taken)+' · '+fmtDate(a.submitted_at)+'</div>'+
-          (secs?'<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;">'+secs+'</div>':'')+
-        '</div></div>';
-      }).join('');
-      return '<details class="item" '+(idx===0?'open':'')+' style="display:block;">'+
-        '<summary style="cursor:pointer;list-style:none;"><div class="row" style="justify-content:space-between;gap:10px;align-items:flex-start;">'+
-          '<div><div class="t">'+esc(u.user_name||'User')+'</div><div class="s">ID: '+esc(u.user_id)+'</div></div>'+
-          '<div class="s" style="text-align:right;">Attempts: <b>'+u.total_attempts+'</b><br>Best: <b>'+esc(u.best_percentage||0)+'%</b> · Avg: <b>'+esc(u.avg_percentage||0)+'%</b><br>Last: '+fmtDate(u.last_attempt_at)+'</div>'+
-        '</div></summary><div style="margin-top:10px;">'+attempts+'</div></details>';
+    if(!users.length){ box.innerHTML='<div class="empty">No users found yet.</div>'; return; }
+    box.innerHTML=users.map(function(u){
+      return '<div class="item" style="align-items:flex-start;">'+
+        '<div style="flex:1;min-width:220px;">'+
+          '<div class="t">'+esc(u.user_name||'User')+'</div>'+
+          '<div class="s">User ID: '+esc(u.user_id)+'</div>'+
+          '<div class="s">First seen: '+fmtDate(u.first_attempt_at)+' · Last active: '+fmtDate(u.last_attempt_at)+'</div>'+
+        '</div>'+
+        '<div class="s" style="text-align:right;min-width:190px;">'+
+          'Total attempts: <b>'+esc(u.total_attempts||0)+'</b><br>'+
+          'Best score: <b>'+esc(u.best_percentage||0)+'%</b><br>'+
+          'Average score: <b>'+esc(u.avg_percentage||0)+'%</b><br>'+
+          'Total practice time: <b>'+fmtTime(u.total_time)+'</b>'+
+        '</div>'+
+      '</div>';
     }).join('');
   }catch(e){ box.innerHTML='<div class="empty" style="color:var(--red);">Failed to load users: '+esc(e.message||e)+'</div>'; }
 }
