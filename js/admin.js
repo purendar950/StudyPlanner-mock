@@ -283,14 +283,8 @@ async function adminLoadUsers(){
       return '<div class="item" style="align-items:flex-start;">'+
         '<div style="flex:1;min-width:220px;">'+
           '<div class="t">'+esc(u.user_name||'User')+'</div>'+
-          '<div class="s">User ID: '+esc(u.user_id)+'</div>'+
-          '<div class="s">First seen: '+fmtDate(u.first_attempt_at)+' · Last active: '+fmtDate(u.last_attempt_at)+'</div>'+
-        '</div>'+
-        '<div class="s" style="text-align:right;min-width:190px;">'+
-          'Total attempts: <b>'+esc(u.total_attempts||0)+'</b><br>'+
-          'Best score: <b>'+esc(u.best_percentage||0)+'%</b><br>'+
-          'Average score: <b>'+esc(u.avg_percentage||0)+'%</b><br>'+
-          'Total practice time: <b>'+fmtTime(u.total_time)+'</b>'+
+          '<div class="s">User ID: '+esc(u.user_id||'-')+'</div>'+
+          '<div class="s">Email: '+esc(u.user_email||'-')+'</div>'+
         '</div>'+
       '</div>';
     }).join('');

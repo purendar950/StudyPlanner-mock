@@ -107,23 +107,18 @@ window.SUPABASE_CONFIG = Object.freeze({
 
     async adminListUsers() {
       var c = requireClient();
-      var ar = await c.from("mock_attempts").select("user_id,user_name,percentage,time_taken,submitted_at").order("submitted_at", { ascending: false });
+      var ar = await c.from("mock_attempts").select("user_id,user_name,user_email,submitted_at").order("submitted_at", { ascending: false });
       if (ar.error) throw ar.error;
       var users = {};
       (ar.data || []).forEach(function(a){
         var uid = a.user_id || "guest";
-        if(!users[uid]) users[uid] = { user_id:uid, user_name:a.user_name || "Guest", total_attempts:0, best_percentage:null, avg_percentage:0, total_time:0, first_attempt_at:null, last_attempt_at:null };
+        if(!users[uid]) users[uid] = { user_id:uid, user_name:a.user_name || "Guest", user_email:a.user_email || "", last_attempt_at:null };
         var u = users[uid];
         if(a.user_name && a.user_name !== "Guest") u.user_name = a.user_name;
-        u.total_attempts++;
-        var pct = Number(a.percentage || 0);
-        u.avg_percentage += pct;
-        if(u.best_percentage == null || pct > u.best_percentage) u.best_percentage = pct;
-        u.total_time += Number(a.time_taken || 0);
+        if(a.user_email) u.user_email = a.user_email;
         if(!u.last_attempt_at || new Date(a.submitted_at) > new Date(u.last_attempt_at)) u.last_attempt_at = a.submitted_at;
-        if(!u.first_attempt_at || new Date(a.submitted_at) < new Date(u.first_attempt_at)) u.first_attempt_at = a.submitted_at;
       });
-      return Object.keys(users).map(function(k){ var u=users[k]; u.avg_percentage = u.total_attempts ? Number((u.avg_percentage/u.total_attempts).toFixed(2)) : 0; return u; })
+      return Object.keys(users).map(function(k){ return users[k]; })
         .sort(function(a,b){ return new Date(b.last_attempt_at||0) - new Date(a.last_attempt_at||0); });
     },
 

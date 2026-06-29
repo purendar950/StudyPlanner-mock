@@ -53,6 +53,7 @@ create table if not exists public.mock_attempts (
   test_id            text not null,
   user_id            text,                       -- Firebase uid / username (app side auth is Firebase)
   user_name          text,
+  user_email         text,
   score              numeric,
   max_score          numeric,
   total_questions    integer,

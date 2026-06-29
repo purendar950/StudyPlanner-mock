@@ -264,7 +264,7 @@
 
   /* ── Session ── */
   function userName(u){ return (u&&u.user_metadata&&u.user_metadata.full_name)||(u&&u.email)||'Student'; }
-  function syncIdentity(){ try{ if(CURRENT_USER){ localStorage.setItem('ez_user_uid',CURRENT_USER.id); localStorage.setItem('ez_user_name',userName(CURRENT_USER)); } else { localStorage.removeItem('ez_user_uid'); localStorage.removeItem('ez_user_name'); } }catch(e){} }
+  function syncIdentity(){ try{ if(CURRENT_USER){ localStorage.setItem('ez_user_uid',CURRENT_USER.id); localStorage.setItem('ez_user_name',userName(CURRENT_USER)); localStorage.setItem('ez_user_email',CURRENT_USER.email||''); } else { localStorage.removeItem('ez_user_uid'); localStorage.removeItem('ez_user_name'); localStorage.removeItem('ez_user_email'); } }catch(e){} }
   async function refreshSession(){ if(!SB) return; try{ var r=await SB.auth.getUser(); CURRENT_USER=(r&&r.data)?r.data.user:null; }catch(e){ CURRENT_USER=null; } syncIdentity(); renderAcct(); renderShell(); }
   function renderAcct(){ var b=document.getElementById('acct'); if(!b) return;
     if(!SB){ b.innerHTML=''; return; }

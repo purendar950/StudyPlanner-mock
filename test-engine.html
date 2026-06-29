@@ -4116,6 +4116,7 @@ async function saveAttemptSupabase(payload) {
       test_id:           payload.quizId,
       user_id:           (typeof localStorage !== 'undefined' && localStorage.getItem('ez_user_uid')) || payload.emailKey || null,
       user_name:         payload.name || "Guest",
+      user_email:        (typeof localStorage !== 'undefined' && localStorage.getItem('ez_user_email')) || null,
       score:             payload.score,
       max_score:         payload.total,
       total_questions:   totalQ,
